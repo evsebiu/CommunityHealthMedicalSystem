@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "medical_record")
+@Table(name = "medical_records")
 
 public class MedicalRecord {
 
@@ -21,15 +21,16 @@ public class MedicalRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+
     private String diagnosis;
 
-    @NotNull
+
     private String prescription;
 
-    @NotNull
+
     private String notes;
 
+    @NotNull(message = "Record date is required.")
     private LocalDate recordDate;
 
     @ManyToOne(fetch = FetchType.LAZY)

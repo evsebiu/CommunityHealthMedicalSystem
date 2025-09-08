@@ -4,6 +4,7 @@ package com.example.CommunityHealthMedicalSystem.Model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,14 +35,25 @@ public class MedicalStaff {
     @NotBlank(message = "Email is required.")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "License number is required.")
     @Column(unique = true)
     private String licenseNumber;
+
+    @NotBlank(message = "Specialization is required.")
+    private String specialization;
 
     public enum Role{
         DOCTOR, TECHNICIAN, NURSE, ADMINISTRATOR
     }
 
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Role is required.")
+    private Role role;
+
     @OneToMany(mappedBy = "medicalStaff", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Appointment> appointments = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
 }

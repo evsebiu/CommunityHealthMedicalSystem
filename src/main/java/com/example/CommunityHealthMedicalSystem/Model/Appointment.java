@@ -2,6 +2,7 @@ package com.example.CommunityHealthMedicalSystem.Model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,9 +24,13 @@ public class Appointment {
 
     private LocalDateTime appointmentDateTime;
 
-    public enum status{
-        SCHEDULED, COMPLETED, CANNCELED, NO_SHOW
+    public enum Status{
+        SCHEDULED, COMPLETED, CANCELLED, NO_SHOW
     }
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Status is required.")
+    private Status status;
 
     private String reason;
     private String notes;

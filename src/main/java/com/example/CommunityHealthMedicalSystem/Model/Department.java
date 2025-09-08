@@ -19,7 +19,6 @@ import java.util.List;
 
 public class Department {
 
-    @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
