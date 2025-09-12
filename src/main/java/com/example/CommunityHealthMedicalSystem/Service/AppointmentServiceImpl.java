@@ -22,8 +22,7 @@ public class AppointmentServiceImpl implements AppointmentService{
 
     private AppointmentService appointmentService;
 
-    AppointmentServiceImpl(AppointmentService appointmentService, AppointmentRepository appointmentRepo){
-        this.appointmentService=appointmentService;
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepo){
         this.appointmentRepo = appointmentRepo;
     }
 
@@ -124,22 +123,29 @@ public class AppointmentServiceImpl implements AppointmentService{
         }
 
         appointmentRepo.deleteById(id);
-        System.out.println("Appointment #" + id + " deleted for patinet " + patient.getFirstName() +
+        System.out.println("Appointment #" + id + " deleted for patient " + patient.getFirstName() +
                 " " + patient.getLastName());
     }
 
     @Override
-    public Appointment updateAppointment(Long id, Appointment appointmentDetails){
+    public Appointment updateAppointment(Long id, Appointment appointmentDetails, Patient patient, MedicalStaff medicalStaff){
         Appointment appointment = appointmentRepo.findById(id)
                 .orElseThrow(()-> new ResourceNotFound("Appointment with id #" + id + " not found."));
+
+        // - Used DeepSeek external Ai to add Security checks.
+        if (!appointment.getPatient().getId().equals(patient.getId())){
+            throw new SecurityException("Patient does not have permission to update appointment.");
+        }
+
+        if (!appointment.getMedicalStaff().getId().equals(medicalStaff.getId())){
+            throw new SecurityException("Medical staff does not have permission to update appointment.");
+        }
+
         appointment.setStatus(appointmentDetails.getStatus());
         appointment.setReason(appointmentDetails.getReason());
         appointment.setNotes(appointmentDetails.getNotes());
-        appointment.setMedicalStaff(appointmentDetails.getMedicalStaff());
         appointment.setAppointmentDateTime(appointmentDetails.getAppointmentDateTime());
         appointment.setDepartment(appointmentDetails.getDepartment());
-        appointment.setPatient(appointmentDetails.getPatient());
-        appointment.setId(appointmentDetails.getId());
 
         return appointmentRepo.save(appointment);
     }

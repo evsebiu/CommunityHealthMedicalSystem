@@ -20,18 +20,14 @@ public interface AppointmentService {
     List<Appointment> getAppointmentByStatus(Appointment.Status status);
     List<Appointment> getAppointmentByPatient(Patient patient);
     List<Appointment> getAppointmentByMedicalStaff(MedicalStaff medicalStaff);
-    List<Appointment> getAppointmentByDeparmentId(Long departmentId);
     List<Appointment> getAppointmentsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 
     //business logic
     Appointment createAppointment(Appointment appointment, MedicalStaff medicalStaff, Patient patient);
     void deleteAppointment(Long id,Patient patient, MedicalStaff medicalStaff);
-    Appointment updateAppointment(Long id, Appointment appointmentDetails);
+    Appointment updateAppointment(Long id, Appointment appointmentDetails, Patient patient, MedicalStaff medicalStaff);
 
     //validation methods
-
-    boolean isAppointmentSlotAvailable(MedicalStaff medicalStaff, LocalDateTime appointmentTime);
-    boolean hasPatientExistingAppointment(Patient patient, LocalDateTime date);
 
     List<Appointment> getAppointmentByDepartmentId(Long departmentId);
 }
