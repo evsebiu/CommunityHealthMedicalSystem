@@ -1,5 +1,9 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
+import com.example.CommunityHealthMedicalSystem.Exception.ConflictException;
+import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
+import com.example.CommunityHealthMedicalSystem.Exception.EntityNotFoundException;
+import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Model.Appointment;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Model.Patient;
@@ -12,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AppointmentServiceImpl extends AppointmentService{
+public class AppointmentServiceImpl implements AppointmentService{
 
     @Autowired
     private final AppointmentRepository appointmentRepo;
@@ -63,4 +67,48 @@ public class AppointmentServiceImpl extends AppointmentService{
     public List<Appointment> getAppointmentsByDateRange(LocalDateTime startDate, LocalDateTime endDate){
         return appointmentRepo.findByAppointmentDateTimeBetween(startDate, endDate);
     }
+
+    @Override
+    public Appointment createAppointment(Appointment appointment, MedicalStaff medicalStaff, Patient patient){
+      if (appointment == null){
+          throw new IllegalArgumentException("Appointment cannot be null");
+      }
+      if (medicalStaff == null){
+          throw new IllegalArgumentException("Medical staff cannot be null");
+      }
+      if (patient == null){
+          throw new IllegalArgumentException("Patient cannot be null");
+      }
+
+      appointment.setMedicalStaff(medicalStaff);
+      appointment.setPatient(patient);
+
+      Optional<Appointment> existing = appointmentRepo.findByMedicalStaffAndDateTime(medicalStaff, appointment.getAppointmentDateTime());
+
+      if (existing.isPresent()){
+          throw new DuplicateResourceException("Appointment already exists at this time for this medical staff.");
+      }
+
+      Optional<Appointment> patientConflict= appointmentRepo.findByPatiendDateAndTime(patient,
+              appointment.getAppointmentDateTime());
+
+      if (patientConflict.isPresent()){
+          throw new ConflictException("Patient already have appointment at this time.");
+      }
+
+      Appointment savedAppointment = appointmentRepo.save(appointment);
+        System.out.println("Appointment created with id: " + savedAppointment.getId());
+      return savedAppointment;
+    }
+
+    @Override
+    public void  deleteAppointment(Long id, Patient patient, MedicalStaff medicalStaff){
+
+        // first step :  find the appointment
+        Optional<Appointment> appointment = appointmentRepo.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("Appointment with id " + id + " not found."));
+
+        // second step: Validate that the logged-in patient and medical staff are the
+        // ones associated with this appointment.
+
 }
