@@ -90,7 +90,7 @@ public class DepartmentServiceImpl implements DepartmentService{
     public List<MedicalStaff> getMedicalStaffByDepartment(Long departmentId){
         Optional<Department> department= departmentRepo.findById(departmentId);
         if (departmentId == null){
-            throw new java.lang.IllegalArgumentException("ID cannot be null.");
+            throw new IllegalArgumentException("ID cannot be null.");
         }
         return departmentRepo.findMedicalStaffByDepartment(departmentId);
     }
