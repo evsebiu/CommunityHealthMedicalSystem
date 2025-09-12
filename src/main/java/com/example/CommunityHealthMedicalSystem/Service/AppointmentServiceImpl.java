@@ -1,9 +1,8 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
-import com.example.CommunityHealthMedicalSystem.Exception.ConflictException;
-import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
-import com.example.CommunityHealthMedicalSystem.Exception.EntityNotFoundException;
+import com.example.CommunityHealthMedicalSystem.Exception.*;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
+import com.example.CommunityHealthMedicalSystem.Exception.SecurityException;
 import com.example.CommunityHealthMedicalSystem.Model.Appointment;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Model.Patient;
@@ -70,7 +69,10 @@ public class AppointmentServiceImpl implements AppointmentService{
 
     @Override
     public Appointment createAppointment(Appointment appointment, MedicalStaff medicalStaff, Patient patient){
-      if (appointment == null){
+
+        // - Used Deepseek external Ai to improve this method.
+
+        if (appointment == null){
           throw new IllegalArgumentException("Appointment cannot be null");
       }
       if (medicalStaff == null){
@@ -104,11 +106,41 @@ public class AppointmentServiceImpl implements AppointmentService{
     @Override
     public void  deleteAppointment(Long id, Patient patient, MedicalStaff medicalStaff){
 
+        // - Used Deepseek external Ai to finish this method.
+
         // first step :  find the appointment
-        Optional<Appointment> appointment = appointmentRepo.findById(id)
+        Appointment appointment = appointmentRepo.findById(id)
                 .orElseThrow(()-> new EntityNotFoundException("Appointment with id " + id + " not found."));
 
         // second step: Validate that the logged-in patient and medical staff are the
         // ones associated with this appointment.
+        if (!appointment.getPatient().getId().equals(patient.getId())){
+            throw new SecurityException("You do not have permission to delete this appointment.");
+        }
 
+        // optional validation : check if medical staff is associated with appointment.
+        if (!appointment.getMedicalStaff().getId().equals(medicalStaff.getId())){
+            throw new SecurityException("Medical Staff does not have permission for this operation.");
+        }
+
+        appointmentRepo.deleteById(id);
+        System.out.println("Appointment #" + id + " deleted for patinet " + patient.getFirstName() +
+                " " + patient.getLastName());
+    }
+
+    @Override
+    public Appointment updateAppointment(Long id, Appointment appointmentDetails){
+        Appointment appointment = appointmentRepo.findById(id)
+                .orElseThrow(()-> new ResourceNotFound("Appointment with id #" + id + " not found."));
+        appointment.setStatus(appointmentDetails.getStatus());
+        appointment.setReason(appointmentDetails.getReason());
+        appointment.setNotes(appointmentDetails.getNotes());
+        appointment.setMedicalStaff(appointmentDetails.getMedicalStaff());
+        appointment.setAppointmentDateTime(appointmentDetails.getAppointmentDateTime());
+        appointment.setDepartment(appointmentDetails.getDepartment());
+        appointment.setPatient(appointmentDetails.getPatient());
+        appointment.setId(appointmentDetails.getId());
+
+        return appointmentRepo.save(appointment);
+    }
 }
