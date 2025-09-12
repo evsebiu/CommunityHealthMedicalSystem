@@ -4,7 +4,6 @@ import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceExcep
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
 import com.example.CommunityHealthMedicalSystem.Model.Department;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
-import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import com.example.CommunityHealthMedicalSystem.Repository.DepartmentRepository;
 import org.springframework.stereotype.Service;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
@@ -50,7 +49,7 @@ public class DepartmentServiceImpl implements DepartmentService{
             throw new IllegalArgumentException("Department cannot be null.");
         }
         if (medicalStaff == null){
-            throw new java.lang.IllegalArgumentException("Medical staff cannot be null.");
+            throw new IllegalArgumentException("Medical staff cannot be null.");
         }
 
 
@@ -65,7 +64,7 @@ public class DepartmentServiceImpl implements DepartmentService{
     }
 
     @Override
-    public Department updateDepartment(Long id, Department departmentDetails){
+    public Department updateDepartment(Long id, Department departmentDetails, Long departmentId){
 
         Department department = departmentRepo.findById(id)
                 .orElseThrow(()-> new ResourceNotFound("Department with id " + id + " does not exist."));
@@ -93,6 +92,6 @@ public class DepartmentServiceImpl implements DepartmentService{
         if (departmentId == null){
             throw new java.lang.IllegalArgumentException("ID cannot be null.");
         }
-        return department.get().getMedicalStaffs();
+        return departmentRepo.findMedicalStaffByDepartment(departmentId);
     }
 }
