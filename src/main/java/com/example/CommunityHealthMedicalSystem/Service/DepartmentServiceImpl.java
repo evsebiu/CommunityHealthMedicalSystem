@@ -89,9 +89,10 @@ public class DepartmentServiceImpl implements DepartmentService{
 
     @Override
     public List<MedicalStaff> getMedicalStaffByDepartment(Long departmentId){
+        Optional<Department> department= departmentRepo.findById(departmentId);
         if (departmentId == null){
             throw new java.lang.IllegalArgumentException("ID cannot be null.");
         }
-        return departmentRepo.findMedicalStaff(departmentId);
+        return department.get().getMedicalStaffs();
     }
 }
