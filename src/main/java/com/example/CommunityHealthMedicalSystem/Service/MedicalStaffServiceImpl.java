@@ -3,7 +3,6 @@ package com.example.CommunityHealthMedicalSystem.Service;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
-import com.example.CommunityHealthMedicalSystem.Exception.SecurityException;
 import com.example.CommunityHealthMedicalSystem.Model.Department;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
