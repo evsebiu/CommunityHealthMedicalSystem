@@ -21,6 +21,8 @@ public interface AppointmentService {
     List<Appointment> getAppointmentByPatient(Patient patient);
     List<Appointment> getAppointmentByMedicalStaff(MedicalStaff medicalStaff);
     List<Appointment> getAppointmentsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+    List<Appointment> getAppointmentByPatientId(Long patientId);
+    List<Appointment> getAppointmentByMedicalId(Long medicalId);
 
     //business logic
     Appointment createAppointment(Appointment appointment, MedicalStaff medicalStaff, Patient patient);

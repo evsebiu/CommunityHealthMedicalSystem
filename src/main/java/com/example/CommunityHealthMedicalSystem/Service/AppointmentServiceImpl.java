@@ -7,6 +7,9 @@ import com.example.CommunityHealthMedicalSystem.Model.Appointment;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import com.example.CommunityHealthMedicalSystem.Repository.AppointmentRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class AppointmentServiceImpl implements AppointmentService{
 
@@ -52,8 +56,18 @@ public class AppointmentServiceImpl implements AppointmentService{
     }
 
     @Override
+    public List<Appointment> getAppointmentByPatientId(Long patientId){
+        return appointmentRepo.findByPatientId(patientId);
+    }
+
+    @Override
     public List<Appointment> getAppointmentByMedicalStaff(MedicalStaff medicalStaff){
         return appointmentRepo.findByMedicalStaff(medicalStaff);
+    }
+
+    @Override
+    public List<Appointment> getAppointmentByMedicalId(Long medicalId){
+        return appointmentRepo.findByMedicalId(medicalId);
     }
 
     @Override
