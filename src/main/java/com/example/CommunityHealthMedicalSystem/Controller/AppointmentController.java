@@ -1,16 +1,20 @@
 package com.example.CommunityHealthMedicalSystem.Controller;
 
+import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Model.Appointment;
+import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Model.Patient;
-import com.example.CommunityHealthMedicalSystem.Service.AppointmentService;
 import com.example.CommunityHealthMedicalSystem.Service.AppointmentServiceImpl;
+import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,7 +71,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/by-department-id/{departmentId}")
-    public ResponseEntity<List<Appointment>> getAppointmentByDeparmentId(@PathVariable Long departmentId){
+    public ResponseEntity<List<Appointment>> getAppointmentByDepartmentId(@PathVariable Long departmentId){
         List<Appointment> appointments = appointmentService.getAppointmentByDepartmentId(departmentId);
         if (appointments.isEmpty()){
             return ResponseEntity.notFound().build();
@@ -75,11 +79,32 @@ public class AppointmentController {
         return ResponseEntity.ok(appointments);
     }
 
+    @GetMapping("/by-date-range")
+    public ResponseEntity<List<Appointment>> getAppointmentByDateRange(
+            @RequestParam("startDate")LocalDateTime startDate,
+            @RequestParam("endDate")LocalDateTime endDate
+            ){
+        List<Appointment> appointments = appointmentService.getAppointmentsByDateRange(startDate,endDate);
+        return ResponseEntity.ok(appointments);
+    }
+
+
+
     @GetMapping("/{id}")
     public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id){
         Optional<Appointment> appointment = appointmentService.getAppointmentById(id);
         return appointment.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Appointment> createAppointment(@RequestBody @Valid Appointment appointment){
+        try {
+            Appointment savedAppointment = appointmentService.createAppointment(appointment);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedAppointment);
+        } catch (DuplicateResourceException e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 }
