@@ -1,5 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
+import com.example.CommunityHealthMedicalSystem.DTO.AppointmentDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.*;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.SecurityException;
@@ -162,5 +163,16 @@ public class AppointmentServiceImpl implements AppointmentService{
         appointment.setDepartment(appointmentDetails.getDepartment());
 
         return appointmentRepo.save(appointment);
+    }
+
+    // dto test
+    Appointment toDTO(Appointment appointment){
+        return new AppointmentDTO(
+                appointment.getId(),
+                appointment.getPatient().getId(),
+                appointment.getMedicalStaff().getId(),
+                appointment.getStatus().name(),
+                appointment.getAppointmentDateTime()
+        );
     }
 }
