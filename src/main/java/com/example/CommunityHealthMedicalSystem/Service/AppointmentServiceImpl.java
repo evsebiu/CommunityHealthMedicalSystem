@@ -166,13 +166,19 @@ public class AppointmentServiceImpl implements AppointmentService{
     }
 
     // dto test
-    Appointment toDTO(Appointment appointment){
-        return new AppointmentDTO(
-                appointment.getId(),
-                appointment.getPatient().getId(),
-                appointment.getMedicalStaff().getId(),
-                appointment.getStatus().name(),
-                appointment.getAppointmentDateTime()
-        );
+    public AppointmentDTO toDTO(Appointment appointment){
+        AppointmentDTO dto = new AppointmentDTO();
+        dto.setId(appointment.getId());
+        dto.setPatientId(appointment.getPatient().getId());
+        dto.setMedicalStaffId(appointment.getMedicalStaff().getId());
+        dto.setStatus(appointment.getStatus());
+        dto.setAppointmentDateTime(appointment.getAppointmentDateTime());
+        dto.setReason(appointment.getReason());
+        dto.setNotes(appointment.getNotes());
+
+        if (appointment.getDepartment() !=null){
+            dto.setDepartmentId(appointment.getDepartment().getId());
+        }
+       return dto;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.DTO;
 
+import com.example.CommunityHealthMedicalSystem.Model.Appointment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,10 @@ public class AppointmentDTO {
     private Long id;
     private Long patientId;
     private Long medicalStaffId;
-    private String status;
+    private Appointment.Status status;
     private LocalDateTime appointmentDateTime;
+    private Long departmentId;
+    private String reason;
+    private String notes;
 
 }
