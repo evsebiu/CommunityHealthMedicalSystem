@@ -16,7 +16,7 @@ A full-stack backend system built with Java and Spring Boot to manage medical st
 - Spring Boot
 - Spring Data JPA
 - Maven
-- H2 / MySQL (configurable)
+- PostgreSQL
 - JUnit 5 & Mockito (for testing)
 - Lombok
 
