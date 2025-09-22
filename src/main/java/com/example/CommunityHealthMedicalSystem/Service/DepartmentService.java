@@ -1,5 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
+import com.example.CommunityHealthMedicalSystem.DTO.DepartmentDTO;
 import com.example.CommunityHealthMedicalSystem.Model.Department;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,10 @@ public interface DepartmentService {
     Optional<Department> getDepartmentById(Long id);
     Optional<Department> getDepartmentByNameIgnoreCase(String name);
     List<Department> getDepartmentByMedicalStaff(MedicalStaff medicalStaff);
-    List<Department> getAllDepartments(Department department);
+    List<Department> getAllDepartments();
 
-    Department createDepartment(Long id, Department department, MedicalStaff medicalStaff);
-    Department updateDepartment(Long id, Department departmentDetails, Long departmentId);
+    DepartmentDTO createDepartment(DepartmentDTO departmentDTO);
+    DepartmentDTO updateDepartment(Long id, DepartmentDTO departmentDTO);
     void deleteDepartment(Long id);
 
     List<MedicalStaff> getMedicalStaffByDepartment(Long departmentId);

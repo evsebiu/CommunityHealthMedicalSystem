@@ -1,5 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
+import com.example.CommunityHealthMedicalSystem.DTO.DepartmentDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
 import com.example.CommunityHealthMedicalSystem.Model.Department;
@@ -21,6 +22,11 @@ public class DepartmentServiceImpl implements DepartmentService{
     }
 
     @Override
+    public List<Department> getAllDepartments(){
+        return departmentRepo.findAll();
+    }
+
+    @Override
     public Optional<Department> getDepartmentById(Long id){
         return departmentRepo.findById(id);
     }
@@ -37,45 +43,43 @@ public class DepartmentServiceImpl implements DepartmentService{
         }
         return departmentRepo.findByMedicalStaffs(medicalStaff);
     }
-
     @Override
-    public List<Department> getAllDepartments(Department department){
-        return departmentRepo.findAll();
-    }
-
-    @Override
-    public Department createDepartment(Long id, Department department, MedicalStaff medicalStaff){
-        if (department == null){
+    public DepartmentDTO createDepartment(DepartmentDTO departmentDTO){
+        if (departmentDTO == null) {
             throw new IllegalArgumentException("Department cannot be null.");
         }
-        if (medicalStaff == null){
-            throw new IllegalArgumentException("Medical staff cannot be null.");
-        }
 
-
-        Optional<Department> existingByName = departmentRepo.findByNameIgnoreCase(department.getName());
+        Optional<Department> existingByName = departmentRepo.findByNameIgnoreCase(departmentDTO.getName());
         if (existingByName.isPresent()){
-            throw new DuplicateResourceException("Department with name " + department.getName() + " already exits.");
+            throw new DuplicateResourceException("Department with name " + departmentDTO.getName() + " already exits.");
         }
+
+        Department department = new Department();
+        department.setDescription(departmentDTO.getDescription());
+        department.setName(departmentDTO.getName());
 
         Department savedDepartment = departmentRepo.save(department);
         System.out.println("Department " + savedDepartment.getName() + " successfully created." );
-        return savedDepartment;
+        return convertToDTO(savedDepartment);
     }
 
     @Override
-    public Department updateDepartment(Long id, Department departmentDetails, Long departmentId){
-
+    public DepartmentDTO updateDepartment(Long id, DepartmentDTO departmentDTO){
+        // 1.find existing appointment.
         Department department = departmentRepo.findById(id)
-                .orElseThrow(()-> new ResourceNotFound("Department with id " + id + " does not exist."));
+                .orElseThrow(()-> new ResourceNotFound("Department with id:" +
+                        id + " not found."));
 
-        if (departmentDetails.getName() != null){
-            department.setName(departmentDetails.getName());
+        // 2. validate input.
+        if (departmentDTO.getName() != null){
+            department.setName(departmentDTO.getName());
         }
-        if (departmentDetails.getName() != null){
-            department.setDescription(departmentDetails.getDescription());
+        if (departmentDTO.getDescription()!=null){
+            department.setDescription(departmentDTO.getDescription());
         }
-        return departmentRepo.save(department);
+        // 3. return and update.
+        Department updateDepartment = departmentRepo.save(department);
+        return convertToDTO(updateDepartment);
     }
 
     @Override
@@ -92,6 +96,26 @@ public class DepartmentServiceImpl implements DepartmentService{
         if (departmentId == null){
             throw new IllegalArgumentException("ID cannot be null.");
         }
+        departmentRepo.findById(departmentId)
+                .orElseThrow(()-> new ResourceNotFound("Department not found " +
+                        "with id: " + departmentId));
+
         return departmentRepo.findMedicalStaffByDepartment(departmentId);
+    }
+
+    public DepartmentDTO convertToDTO(Department department){
+        DepartmentDTO dto = new DepartmentDTO();
+
+        dto.setId(department.getId());
+        dto.setName(department.getName());
+        dto.setDescription(department.getDescription());
+
+        dto.setMedicalStaffCount(
+            department.getMedicalStaffs() != null ? department.getMedicalStaffs().size() : 0);
+
+        dto.setActiveAppointmentsCount(
+                department.getAppointments() != null ? department.getAppointments().size() : 0);
+
+        return dto;
     }
 }

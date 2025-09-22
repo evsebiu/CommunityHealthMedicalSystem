@@ -1,8 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.DTO;
 
 import com.example.CommunityHealthMedicalSystem.Model.Appointment;
-import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
-import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
