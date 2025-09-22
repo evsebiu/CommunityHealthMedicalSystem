@@ -20,7 +20,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByMedicalStaff(MedicalStaff medicalStaff);
     List<Appointment> findAll();
     List<Appointment> findByDepartmentId(Long departmentId);
-    Optional<Appointment> findByPatiendDateAndTime(Patient patient, LocalDateTime localDateTime);
+    Optional<Appointment> findByPatientDateAndTime(Patient patient, LocalDateTime localDateTime);
     Optional<Appointment> findByMedicalStaffAndDateTime(MedicalStaff medicalStaff, LocalDateTime appointmentDateTime);
     List<Appointment> findByAppointmentDateTimeBetween(LocalDateTime start, LocalDateTime end);
     List<Appointment> findByPatientIdAndAppointmentDateTimeBetween(Long patientId, LocalDate startDate, LocalDate endDate);
