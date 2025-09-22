@@ -137,7 +137,7 @@ public class AppointmentServiceImpl implements AppointmentService{
 
       if (appointmentDTO.getStatus() != null) {
           try {
-              appointment.setStatus(Appointment.Status.valueOf(String.valueOf(appointmentDTO.getStatus())));
+              appointment.setStatus(Appointment.Status.valueOf(appointmentDTO.getStatus().name()));
           } catch (IllegalArgumentException e) {
               appointment.setStatus(Appointment.Status.SCHEDULED);
           }
@@ -193,6 +193,7 @@ public class AppointmentServiceImpl implements AppointmentService{
                     medicalStaff= medicalStaffRepo.findById(appointmentDTO.getMedicalStaffId())
                             .orElse(existingAppointment.getMedicalStaff());
                 }
+                existingAppointment.setAppointmentDateTime(appointmentDTO.getAppointmentDateTime());
 
                 Patient patient  = existingAppointment.getPatient();
                 if (appointmentDTO.getPatientId() !=null ){
