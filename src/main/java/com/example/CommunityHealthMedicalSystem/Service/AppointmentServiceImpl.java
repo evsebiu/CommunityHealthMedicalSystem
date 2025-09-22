@@ -137,7 +137,7 @@ public class AppointmentServiceImpl implements AppointmentService{
 
       if (appointmentDTO.getStatus() != null) {
           try {
-              appointment.setStatus(Appointment.Status.valueOf(appointmentDTO.getStatus().name()));
+              appointment.setStatus(appointmentDTO.getStatus());
           } catch (IllegalArgumentException e) {
               appointment.setStatus(Appointment.Status.SCHEDULED);
           }
@@ -216,7 +216,7 @@ public class AppointmentServiceImpl implements AppointmentService{
 
         if (appointmentDTO.getStatus() != null){
             try{
-                existingAppointment.setStatus(Appointment.Status.valueOf(String.valueOf(appointmentDTO.getStatus())));
+                existingAppointment.setStatus(appointmentDTO.getStatus());
             } catch (IllegalArgumentException e){
                 throw new IllegalArgumentException("Invalid status : " + appointmentDTO.getStatus());
             }
