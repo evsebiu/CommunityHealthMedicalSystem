@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -91,7 +92,7 @@ public class AppointmentServiceImpl implements AppointmentService{
     }
 
     @Override
-    public Appointment createAppointment(AppointmentDTO appointmentDTO){
+    public AppointmentDTO createAppointment(AppointmentDTO appointmentDTO){
 
         // - Used Deepseek external Ai to improve this method.
 
@@ -133,11 +134,20 @@ public class AppointmentServiceImpl implements AppointmentService{
       appointment.setMedicalStaff(medicalStaff);
       appointment.setAppointmentDateTime(appointmentDTO.getAppointmentDateTime());
       appointment.setReason(appointmentDTO.getReason());
-      appointment.setStatus(appointmentDTO.getStatus());
+
+      if (appointmentDTO.getStatus() != null) {
+          try {
+              appointment.setStatus(Appointment.Status.valueOf(String.valueOf(appointmentDTO.getStatus())));
+          } catch (IllegalArgumentException e) {
+              appointment.setStatus(Appointment.Status.SCHEDULED);
+          }
+      } else{
+          appointment.setStatus(Appointment.Status.SCHEDULED);
+          }
 
       Appointment savedAppointment = appointmentRepo.save(appointment);
         System.out.println("Appointment created with id: " + savedAppointment.getId());
-      return savedAppointment;
+      return convertToDTO(savedAppointment);
     }
 
     @Override
@@ -163,35 +173,79 @@ public class AppointmentServiceImpl implements AppointmentService{
     }
 
     @Override
-    public Appointment updateAppointment(Long id, Appointment appointmentDetails, Patient patient, MedicalStaff medicalStaff){
-        Appointment appointment = appointmentRepo.findById(id)
+    public AppointmentDTO updateAppointment(Long id,AppointmentDTO appointmentDTO){
+
+        // 1. find existing appointment.
+        Appointment existingAppointment = appointmentRepo.findById(id)
                 .orElseThrow(()-> new ResourceNotFound("Appointment with id #" + id + " not found."));
 
-        // - Used DeepSeek external Ai to add Security checks.
-        if (!appointment.getPatient().getId().equals(patient.getId())){
-            throw new SecurityException("Patient does not have permission to update appointment.");
+        //2. validate input
+        if (appointmentDTO == null){
+            throw new IllegalArgumentException("AppointmentDTO cannot be null.");
         }
 
-        if (!appointment.getMedicalStaff().getId().equals(medicalStaff.getId())){
-            throw new SecurityException("Medical staff does not have permission to update appointment.");
+        // 3. update field from DTO (only non-null fields)
+        if (appointmentDTO.getAppointmentDateTime() !=null){
+            if (!existingAppointment.getAppointmentDateTime().equals(appointmentDTO.getAppointmentDateTime())){
+
+                MedicalStaff medicalStaff = existingAppointment.getMedicalStaff();
+                if (appointmentDTO.getMedicalStaffId() != null ){
+                    medicalStaff= medicalStaffRepo.findById(appointmentDTO.getMedicalStaffId())
+                            .orElse(existingAppointment.getMedicalStaff());
+                }
+
+                Patient patient  = existingAppointment.getPatient();
+                if (appointmentDTO.getPatientId() !=null ){
+                    patient = patientRepo.findById(appointmentDTO.getPatientId())
+                            .orElse(existingAppointment.getPatient());
+                }
+
+                //staff conflict check
+                Optional<Appointment> staffConflict  = appointmentRepo
+                        .findByMedicalStaffAndDateTime(medicalStaff, appointmentDTO.getAppointmentDateTime());
+                if (staffConflict.isPresent() && !staffConflict.get().getId().equals(id)){
+                    throw new ConflictException("Meical staff already has appointment at this time.");
+                }
+
+            }
+        }
+        if (appointmentDTO.getReason() != null){
+            existingAppointment.setReason(appointmentDTO.getReason());
         }
 
-        appointment.setStatus(appointmentDetails.getStatus());
-        appointment.setReason(appointmentDetails.getReason());
-        appointment.setNotes(appointmentDetails.getNotes());
-        appointment.setAppointmentDateTime(appointmentDetails.getAppointmentDateTime());
-        appointment.setDepartment(appointmentDetails.getDepartment());
+        if (appointmentDTO.getStatus() != null){
+            try{
+                existingAppointment.setStatus(Appointment.Status.valueOf(String.valueOf(appointmentDTO.getStatus())));
+            } catch (IllegalArgumentException e){
+                throw new IllegalArgumentException("Invalid status : " + appointmentDTO.getStatus());
+            }
+        }
+        //handle realtionship updates.
+        if (appointmentDTO.getPatientId() != null){
+            Patient patient = patientRepo.findById(appointmentDTO.getPatientId())
+                    .orElseThrow(()-> new ResourceNotFound("Patient not found."));
+            existingAppointment.setPatient(patient);
+        }
+        if (appointmentDTO.getMedicalStaffId() != null){
+            MedicalStaff medicalStaff = medicalStaffRepo.findById(appointmentDTO.getMedicalStaffId())
+                    .orElseThrow(()-> new ResourceNotFound("Medical staff not found."));
+            existingAppointment.setMedicalStaff(medicalStaff);
+        }
 
-        return appointmentRepo.save(appointment);
+        //save and return DTO
+
+        Appointment updatedAppointment = appointmentRepo.save(existingAppointment);
+        return convertToDTO(updatedAppointment);
     }
 
     // dto test
-    public AppointmentDTO toDTO(Appointment appointment){
+    public AppointmentDTO convertToDTO(Appointment appointment){
         AppointmentDTO dto = new AppointmentDTO();
+
         dto.setId(appointment.getId());
         dto.setPatientId(appointment.getPatient().getId());
         dto.setMedicalStaffId(appointment.getMedicalStaff().getId());
-        dto.setStatus(appointment.getStatus());
+        dto.setStatus(Appointment.Status.valueOf(appointment.getStatus().name()));
         dto.setAppointmentDateTime(appointment.getAppointmentDateTime());
         dto.setReason(appointment.getReason());
         dto.setNotes(appointment.getNotes());
