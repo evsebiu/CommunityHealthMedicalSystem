@@ -1,6 +1,8 @@
 package com.example.CommunityHealthMedicalSystem.DTO;
 
 import com.example.CommunityHealthMedicalSystem.Model.Appointment;
+import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
+import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,5 +36,10 @@ public class AppointmentDTO {
     private String reason;
 
     private String notes;
+
+    @NotNull(message = "Appointment duration is required.")
+    @Min(value = 15, message = "Appointment must be at least 15 minutes.")
+    @Max(value = 240, message = "Appointment cannot exceed 4 hours.")
+    private Integer appointmentDuration;
 
 }

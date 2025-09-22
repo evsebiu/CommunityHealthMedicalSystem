@@ -35,6 +35,10 @@ public class Appointment {
     private String reason;
     private String notes;
 
+    @NotNull(message = "Appointment duration is required.")
+    @Column(name = "duration_minutes")
+    private Integer appointmentDuration;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
     private Patient patient;

@@ -27,7 +27,7 @@ public interface AppointmentService {
 
 
     //business logic
-    Appointment createAppointment(Appointment appointment, MedicalStaff medicalStaff, Patient patient);
+    Appointment createAppointment(AppointmentDTO appointmentDTO);
     void deleteAppointment(Long id,Patient patient, MedicalStaff medicalStaff);
     Appointment updateAppointment(Long id, Appointment appointmentDetails, Patient patient, MedicalStaff medicalStaff);
 

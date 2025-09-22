@@ -8,6 +8,8 @@ import com.example.CommunityHealthMedicalSystem.Model.Appointment;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import com.example.CommunityHealthMedicalSystem.Repository.AppointmentRepository;
+import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
+import com.example.CommunityHealthMedicalSystem.Repository.PatientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +26,18 @@ public class AppointmentServiceImpl implements AppointmentService{
 
     @Autowired
     private final AppointmentRepository appointmentRepo;
+    @Autowired
+    private final PatientRepository patientRepo;
+    @Autowired
+    private final MedicalStaffRepository medicalStaffRepo;
 
     private AppointmentService appointmentService;
 
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepo){
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepo, PatientRepository patientRepo,
+                                  MedicalStaffRepository medicalStaffRepo){
         this.appointmentRepo = appointmentRepo;
+        this.patientRepo=patientRepo;
+        this.medicalStaffRepo=medicalStaffRepo;
     }
 
     @Override
@@ -82,35 +91,49 @@ public class AppointmentServiceImpl implements AppointmentService{
     }
 
     @Override
-    public Appointment createAppointment(Appointment appointment, MedicalStaff medicalStaff, Patient patient){
+    public Appointment createAppointment(AppointmentDTO appointmentDTO){
 
         // - Used Deepseek external Ai to improve this method.
 
-        if (appointment == null){
+        if (appointmentDTO == null){
           throw new IllegalArgumentException("Appointment cannot be null");
       }
-      if (medicalStaff == null){
+      if (appointmentDTO.getMedicalStaffId() == null){
           throw new IllegalArgumentException("Medical staff cannot be null");
       }
-      if (patient == null){
+      if (appointmentDTO.getPatientId() == null){
           throw new IllegalArgumentException("Patient cannot be null");
       }
 
-      appointment.setMedicalStaff(medicalStaff);
-      appointment.setPatient(patient);
+      Patient patient = patientRepo.findById(appointmentDTO.getPatientId())
+              .orElseThrow(()-> new ResourceNotFound("Patient not found with id: " +
+                      appointmentDTO.getPatientId()));
 
-      Optional<Appointment> existing = appointmentRepo.findByMedicalStaffAndDateTime(medicalStaff, appointment.getAppointmentDateTime());
+      MedicalStaff medicalStaff = medicalStaffRepo.findById(appointmentDTO.getMedicalStaffId())
+              .orElseThrow(()-> new ResourceNotFound("Medical staff not found with id: " +
+                      appointmentDTO.getMedicalStaffId()));
+
+      Optional<Appointment> existing = appointmentRepo.findByMedicalStaffAndDateTime(medicalStaff,
+              appointmentDTO.getAppointmentDateTime());
 
       if (existing.isPresent()){
           throw new DuplicateResourceException("Appointment already exists at this time for this medical staff.");
       }
 
-      Optional<Appointment> patientConflict= appointmentRepo.findByPatiendDateAndTime(patient,
-              appointment.getAppointmentDateTime());
+      Optional<Appointment> patientConflict= appointmentRepo.findByPatientDateAndTime(patient,
+              appointmentDTO.getAppointmentDateTime());
 
       if (patientConflict.isPresent()){
           throw new ConflictException("Patient already have appointment at this time.");
       }
+
+      //convert dto to entity
+        Appointment appointment = new Appointment();
+      appointment.setPatient(patient);
+      appointment.setMedicalStaff(medicalStaff);
+      appointment.setAppointmentDateTime(appointmentDTO.getAppointmentDateTime());
+      appointment.setReason(appointmentDTO.getReason());
+      appointment.setStatus(appointmentDTO.getStatus());
 
       Appointment savedAppointment = appointmentRepo.save(appointment);
         System.out.println("Appointment created with id: " + savedAppointment.getId());
@@ -120,14 +143,11 @@ public class AppointmentServiceImpl implements AppointmentService{
     @Override
     public void  deleteAppointment(Long id, Patient patient, MedicalStaff medicalStaff){
 
-        // - Used Deepseek external Ai to finish this method.
 
-        // first step :  find the appointment
         Appointment appointment = appointmentRepo.findById(id)
                 .orElseThrow(()-> new EntityNotFoundException("Appointment with id " + id + " not found."));
 
-        // second step: Validate that the logged-in patient and medical staff are the
-        // ones associated with this appointment.
+
         if (!appointment.getPatient().getId().equals(patient.getId())){
             throw new SecurityException("You do not have permission to delete this appointment.");
         }
@@ -175,6 +195,7 @@ public class AppointmentServiceImpl implements AppointmentService{
         dto.setAppointmentDateTime(appointment.getAppointmentDateTime());
         dto.setReason(appointment.getReason());
         dto.setNotes(appointment.getNotes());
+        dto.setAppointmentDuration(appointment.getAppointmentDuration());
 
         if (appointment.getDepartment() !=null){
             dto.setDepartmentId(appointment.getDepartment().getId());
