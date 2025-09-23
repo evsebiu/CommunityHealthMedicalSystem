@@ -1,77 +1,51 @@
-🏥 Community Health Medical System
-A modern Spring Boot medical management system for community health centers with complete patient, staff, appointment, and medical records management.
+Community Health Medical System
 
-🌟 Key Features
-🔐 Secure Authentication
-JWT-based security with role-based access control
+A Spring Boot application for managing patients, doctors, departments, and appointments in a healthcare setting.
+Built with Java 17, Spring Boot, Spring Data JPA, H2/MySQL, and Lombok.
 
-Four user roles: DOCTOR, NURSE, TECHNICIAN, ADMINISTRATOR
+✨ Features
 
-Protected API endpoints with proper authorization
+Manage patients, doctors, and departments
 
-👥 Core Modules
-Patient Management - Complete profiles and medical history
+Schedule and track appointments
 
-Medical Staff - Role-based staff management with departments
+REST API with DTOs for clean responses
 
-Appointment System - Scheduling with conflict detection
+Database support: H2 (dev) and MySQL (prod)
 
-Medical Records - Secure diagnosis and prescription tracking
+Service–Repository–Controller architecture
 
-Department Management - Organized staff assignment
+Work in progress: security, logging, and tests
 
-🛠 Tech Stack
-Backend: Java 17 • Spring Boot 3 • Spring Security • JPA/Hibernate • MySQL
-Security:• Role-based Access
-Tools: Maven • Lombok • Jakarta Validation
+🚀 Getting Started
+Prerequisites
 
-👥 User Roles & Access
-Role	Permissions
-DOCTOR	Full medical access + prescriptions
-NURSE	Patient care + basic operations
-TECHNICIAN	Lab tests + technical procedures
-ADMIN	System management + user control
+Java 17+
 
-💡 Key Entities
-MedicalRecord
-Diagnosis, prescription, notes tracking
+Maven
 
-Linked to Patient and MedicalStaff
+(Optional) MySQL
 
-Date-based record keeping
 
-Appointment
-Status tracking (SCHEDULED/COMPLETED/CANCELLED)
+Database
 
-Patient-Staff scheduling with time slots
+Default: H2 (in-memory, auto-configured)
 
-Conflict prevention
+To use MySQL: update application.properties
 
-MedicalStaff
-Specialized roles and departments
+📌 Roadmap
 
-License number validation
+ Complete DTO mapping
 
-Appointment management
+ Add unit & integration tests
 
-🎯 Business Logic
-Duplicate prevention - No duplicate medical records per patient/date
+ Role-based security with Spring Security
 
-Authorization checks - Staff can only modify their own records
+ Centralized logging & error handling
 
-Validation - Comprehensive input validation on all DTOs
+ API docs (Swagger / OpenAPI)
 
-Error handling - Custom exceptions for better error messages
+📖 License
 
-📊 Sample Data Flow
-Patient registers → System creates profile
-
-Staff member logs in → JWT token issued
-
-Schedule appointment → Availability checked
-
-Create medical record → Authorization validated
-
-Access records → Role-based filtering applied
-
-Built with ❤️ by @evsebiu
+This project is under the MIT License. (do whatever you want, but don’t sue me)
+built with ❤️ by @evsebiu
