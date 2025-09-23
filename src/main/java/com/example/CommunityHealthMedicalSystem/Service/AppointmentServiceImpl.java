@@ -205,7 +205,7 @@ public class AppointmentServiceImpl implements AppointmentService{
                 Optional<Appointment> staffConflict  = appointmentRepo
                         .findByMedicalStaffAndDateTime(medicalStaff, appointmentDTO.getAppointmentDateTime());
                 if (staffConflict.isPresent() && !staffConflict.get().getId().equals(id)){
-                    throw new ConflictException("Meical staff already has appointment at this time.");
+                    throw new ConflictException("Medical staff already has appointment at this time.");
                 }
 
             }

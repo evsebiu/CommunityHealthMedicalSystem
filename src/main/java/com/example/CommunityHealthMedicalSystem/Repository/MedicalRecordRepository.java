@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Long> {
-    List<MedicalRecord> findByDiagnosis(String diagnosis);
+    List<MedicalRecord> findByDiagnosisIgnoreCase(String diagnosis);
     List<MedicalRecord> findByPrescription(String prescription);
     List<MedicalRecord> findByNotes(String notes);
     List<MedicalRecord> findByRecordDate(LocalDate recordDate);
     List<MedicalRecord> findByMedicalStaff(MedicalStaff medicalStaff);
     List<MedicalRecord> findByRecordDateBetween(LocalDate startDate, LocalDate endDate);
     List<MedicalRecord> findMedicalRecordByPatient(Patient patient);
-    List<MedicalRecord> findMedicalRecordByPatiendId(Long patientId);
-    boolean exitsByPatientAndRecordDate(Patient patient, LocalDate recordDate);
+    List<MedicalRecord> findMedicalRecordByPatientId(Long patientId);
+    boolean existsByPatientAndRecordDate(Patient patient, LocalDate recordDate);
 }

@@ -1,5 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
+import com.example.CommunityHealthMedicalSystem.DTO.MedicalRecordDTO;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalRecord;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Model.Patient;
@@ -22,7 +23,7 @@ public interface MedicalRecordService {
     List<MedicalRecord> getMedicalRecordByPatient(Patient patient);
     List<MedicalRecord> getMedicalRecordByPatientId(Long patientId);
 
-    MedicalRecord createMedicalRecord(MedicalRecord medicalRecord, Patient patient, MedicalStaff medicalStaff);
+    MedicalRecordDTO createMedicalRecord(MedicalRecordDTO medicalRecordDTO);
     void deleteMedicalRecord(Long id, MedicalStaff deletingStaff);
-    MedicalRecord updateMedicalRecord(Long id, MedicalRecord medicalRecordDetails, MedicalStaff updatingStaff);
+    MedicalRecordDTO updateMedicalRecord(MedicalRecordDTO medicalRecordDTO);
 }

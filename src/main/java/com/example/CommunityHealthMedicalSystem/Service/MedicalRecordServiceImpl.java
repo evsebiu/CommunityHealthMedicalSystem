@@ -1,6 +1,7 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
 
+import com.example.CommunityHealthMedicalSystem.DTO.MedicalRecordDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
@@ -47,7 +48,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
         if (diagnosis == null){
             throw new IllegalArgumentException("Patient diagnosis cannot be null!");
         }
-        return medicalRecordRepo.findByDiagnosis(diagnosis);
+        return medicalRecordRepo.findByDiagnosisIgnoreCase(diagnosis);
     }
 
     @Override
@@ -117,49 +118,51 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
         if (patientId == null){
             throw new IllegalArgumentException("Patiend ID is required to get Medical Records.");
         }
-        return medicalRecordRepo.findMedicalRecordByPatiendId(patientId);
+        return medicalRecordRepo.findMedicalRecordByPatientId(patientId);
     }
 
     @Override
-    public MedicalRecord createMedicalRecord(MedicalRecord medicalRecord, Patient patient, MedicalStaff medicalStaff){
-        if (medicalRecord == null){
+    public MedicalRecordDTO createMedicalRecord(MedicalRecordDTO medicalRecordDTO){
+        //1. validate inputs.
+        if (medicalRecordDTO == null){
             throw new IllegalArgumentException("Medical record is required, it cannot be null.");
         }
-        if (patient == null){
+        if (medicalRecordDTO.getPatientId() == null){
             throw new IllegalArgumentException("Patient field is required, it cannot be null.");
         }
-        if (medicalStaff == null){
+        if (medicalRecordDTO.getMedicalStaffId() == null){
             throw new IllegalArgumentException("Medical staff is a required field, it cannot be null.");
         }
-
-        Optional<MedicalRecord> existInDatabase = medicalRecordRepo.findById(medicalRecord.getId());
-        if (existInDatabase.isPresent()){
-            throw new DuplicateResourceException("Medical record already exist in database, it cannot overwrite.");
+        if (medicalRecordDTO.getRecordDate() == null){
+            throw new IllegalArgumentException("Record date is required.");
         }
 
-        Patient existstingPatient = patientRepo.findById(patient.getId())
-                        .orElseThrow(()-> new ResourceNotFound("Patient not found."));
-        MedicalStaff existingStaff = medicalStaffRepo.findById(medicalStaff.getId())
-                        .orElseThrow(()->new ResourceNotFound("Medical Staff not found."));
+        //2. check if patients exists.
+        Patient patient = patientRepo.findById(medicalRecordDTO.getPatientId())
+                .orElseThrow(()-> new ResourceNotFound("Patient with ID " + medicalRecordDTO.getPatientId() +
+                                " does not exists in database."));
 
+        //3. check if medical staff exists.
+        MedicalStaff medicalStaff = medicalStaffRepo.findById(medicalRecordDTO.getMedicalStaffId())
+                .orElseThrow(()-> new ResourceNotFound("Medical staff with ID" + medicalRecordDTO.getMedicalStaffId() +
+                        " does not exists in database."));
+
+        //4. check for duplicate medical records.
+        if (medicalRecordRepo.existsByPatientAndRecordDate(patient, medicalRecordDTO.getRecordDate())){
+            throw new DuplicateResourceException("Medical record with same details already exists.");
+        }
+
+        // 3. convert DTO to entity
+        MedicalRecord medicalRecord = new MedicalRecord();
         medicalRecord.setPatient(patient);
         medicalRecord.setMedicalStaff(medicalStaff);
-        medicalRecord.setRecordDate(LocalDate.now());
-
-        if (isDuplicateMedicalRecord(medicalRecord)){
-            throw new DuplicateResourceException("Same medical records already exits for this patient.");
-        }
+        medicalRecord.setNotes(medicalRecordDTO.getNotes());
+        medicalRecord.setPrescription(medicalRecordDTO.getPrescription());
+        medicalRecord.setDiagnosis(medicalRecordDTO.getDiagnosis());
+        medicalRecord.setRecordDate(medicalRecordDTO.getRecordDate());
 
         MedicalRecord savedMedicalRecord = medicalRecordRepo.save(medicalRecord);
-        System.out.println("Medical Record saved for " + patient.getFirstName() + " " + patient.getLastName() +
-                " " + "with Medical Staff " + medicalStaff.getLastName() + " department " + medicalStaff.getDepartment() +
-                " specialization " + medicalStaff.getSpecialization());
-        return savedMedicalRecord;
-    }
-
-    //helper method to check duplicate records
-    private boolean isDuplicateMedicalRecord(MedicalRecord medicalRecord){
-        return medicalRecordRepo.exitsByPatientAndRecordDate(medicalRecord.getPatient(), medicalRecord.getRecordDate());
+        return convertToDTO(savedMedicalRecord);
     }
 
     @Override
@@ -178,27 +181,72 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
     }
 
     @Override
-    public MedicalRecord updateMedicalRecord(Long id, MedicalRecord medicalRecordDetails ,MedicalStaff updatingStaff){
-        if (updatingStaff == null){
-            throw new IllegalArgumentException("Updating Medical Staff is a required field, it cannot be null.");
+    public MedicalRecordDTO updateMedicalRecord(MedicalRecordDTO medicalRecordDTO){
+        // 1. find existing medical record.
+        MedicalRecord existingRecord = medicalRecordRepo.findById(medicalRecordDTO.getId())
+                .orElseThrow(()-> new ResourceNotFound("Medical record with ID " + medicalRecordDTO.getId() +
+                        " does not exists in database."));
+        //2. validate input
+        if (medicalRecordDTO == null){
+            throw new IllegalArgumentException("Medical record cannot be null.");
         }
 
-        MedicalRecord existingRecord = medicalRecordRepo.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Medical record not found."));
+        //3. update fields from DTO
+        if (medicalRecordDTO.getRecordDate() != null){
+            if (!existingRecord.getRecordDate().equals(medicalRecordDTO.getRecordDate())){
 
-        if (medicalRecordDetails.getDiagnosis()!= null){
-            existingRecord.setDiagnosis(medicalRecordDetails.getDiagnosis());
-        }
-        if (medicalRecordDetails.getNotes() != null){
-            existingRecord.setNotes(medicalRecordDetails.getNotes());
-        }
-        if (medicalRecordDetails.getPrescription() != null){
-                existingRecord.setPrescription(medicalRecordDetails.getPrescription());
-        }
+                Patient patient = existingRecord.getPatient();
+                if (medicalRecordDTO.getPatientId() != null){
+                    patient = patientRepo.findById(medicalRecordDTO.getPatientId())
+                            .orElse(existingRecord.getPatient());
+                }
+                existingRecord.setRecordDate(medicalRecordDTO.getRecordDate());
+                MedicalStaff medicalStaff = existingRecord.getMedicalStaff();
+                if (medicalRecordDTO.getMedicalStaffId() != null){
+                    medicalStaff = medicalStaffRepo.findById(medicalRecordDTO.getMedicalStaffId())
+                            .orElse(existingRecord.getMedicalStaff());
+                }
+            }
+            if (medicalRecordDTO.getNotes() != null){
+                existingRecord.setNotes(medicalRecordDTO.getNotes());
+            }
+            if (medicalRecordDTO.getDiagnosis() != null){
+                existingRecord.setDiagnosis(medicalRecordDTO.getDiagnosis());
+            }
+            if (medicalRecordDTO.getPrescription() !=null){
+                existingRecord.setPrescription(medicalRecordDTO.getPrescription());
+            }
 
-        if (medicalRecordDetails.getRecordDate() != null){
-            existingRecord.setRecordDate(medicalRecordDetails.getRecordDate());
+            // 4. handle relationship updates.
+            if (medicalRecordDTO.getPatientId() != null){
+                Patient patient = patientRepo.findById(medicalRecordDTO.getPatientId())
+                        .orElseThrow(()-> new ResourceNotFound("Patient with ID: " + medicalRecordDTO.getPatientId() +
+                                " not found."));
+                existingRecord.setPatient(patient);
+            }
+            if(medicalRecordDTO.getMedicalStaffId() != null){
+                MedicalStaff medicalStaff = medicalStaffRepo.findById(medicalRecordDTO.getMedicalStaffId())
+                        .orElseThrow(()-> new ResourceNotFound("MedicalStaff with ID: " + medicalRecordDTO.getMedicalStaffId() +
+                                "not found."));
+                existingRecord.setMedicalStaff(medicalStaff);
+            }
         }
-        return medicalRecordRepo.save(existingRecord);
+        MedicalRecord updatedMedicalRecord = medicalRecordRepo.save(existingRecord);
+        return convertToDTO(updatedMedicalRecord);
+    }
+
+    public MedicalRecordDTO convertToDTO (MedicalRecord medicalRecord){
+
+        MedicalRecordDTO dto = new MedicalRecordDTO();
+
+        dto.setId(medicalRecord.getId());
+        dto.setDiagnosis(medicalRecord.getDiagnosis());
+        dto.setMedicalStaffId(medicalRecord.getMedicalStaff().getId());
+        dto.setRecordDate(medicalRecord.getRecordDate());
+        dto.setPrescription(medicalRecord.getPrescription());
+        dto.setNotes(medicalRecord.getNotes());
+        dto.setPatientId(medicalRecord.getPatient().getId());
+
+        return dto;
     }
 }
