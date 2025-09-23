@@ -1,51 +1,77 @@
-# 🏥 Community Health Medical System
+🏥 Community Health Medical System
+A modern Spring Boot medical management system for community health centers with complete patient, staff, appointment, and medical records management.
 
-A full-stack backend system built with Java and Spring Boot to manage medical staff, departments, and appointments in a healthcare environment.
+🌟 Key Features
+🔐 Secure Authentication
+JWT-based security with role-based access control
 
-## 🚀 Features
+Four user roles: DOCTOR, NURSE, TECHNICIAN, ADMINISTRATOR
 
-- Manage doctors, departments, and patient appointments
-- Layered architecture with Entities, Repositories, Services, and Controllers
-- Data Transfer Objects (DTOs) for clean API responses
-- Unit testing with JUnit and Mockito (in progress)
-- Logging and security features (in progress)
+Protected API endpoints with proper authorization
 
-## 🔧 Tech Stack
+👥 Core Modules
+Patient Management - Complete profiles and medical history
 
-- Java 17
-- Spring Boot
-- Spring Data JPA
-- Maven
-- PostgreSQL
-- JUnit 5 & Mockito (for testing)
-- Lombok
+Medical Staff - Role-based staff management with departments
 
-## 📁 Project Structure
+Appointment System - Scheduling with conflict detection
 
-com.evse.medicalsystem
-├── controller # REST API endpoints (WIP)
-├── dto # Data Transfer Objects (WIP)
-├── entity # JPA entities
-├── repository # Spring Data repositories
-├── service # Business logic layer
-├── config # Security & application configs (coming)
+Medical Records - Secure diagnosis and prescription tracking
 
+Department Management - Organized staff assignment
 
-## 🧪 Testing(coming)
+🛠 Tech Stack
+Backend: Java 17 • Spring Boot 3 • Spring Security • JPA/Hibernate • MySQL
+Security:• Role-based Access
+Tools: Maven • Lombok • Jakarta Validation
 
-- Unit tests will cover service and controller layers
-- Focus on both happy paths and edge cases
+👥 User Roles & Access
+Role	Permissions
+DOCTOR	Full medical access + prescriptions
+NURSE	Patient care + basic operations
+TECHNICIAN	Lab tests + technical procedures
+ADMIN	System management + user control
 
-## 🛡️ Security
+💡 Key Entities
+MedicalRecord
+Diagnosis, prescription, notes tracking
 
-- Planned: role-based access control with Spring Security
+Linked to Patient and MedicalStaff
 
-## 📝 Status
+Date-based record keeping
 
-🟢 Core business logic and structure complete  
-🟡 DTOs, Controllers, Unit Testing, and Logging/Security in progress
+Appointment
+Status tracking (SCHEDULED/COMPLETED/CANCELLED)
 
-## 🧑‍💻 Author
+Patient-Staff scheduling with time slots
 
-- Built by [@evsebiu](https://github.com/evsebiu) as a learning project
+Conflict prevention
 
+MedicalStaff
+Specialized roles and departments
+
+License number validation
+
+Appointment management
+
+🎯 Business Logic
+Duplicate prevention - No duplicate medical records per patient/date
+
+Authorization checks - Staff can only modify their own records
+
+Validation - Comprehensive input validation on all DTOs
+
+Error handling - Custom exceptions for better error messages
+
+📊 Sample Data Flow
+Patient registers → System creates profile
+
+Staff member logs in → JWT token issued
+
+Schedule appointment → Availability checked
+
+Create medical record → Authorization validated
+
+Access records → Role-based filtering applied
+
+Built with ❤️ by @evsebiu
