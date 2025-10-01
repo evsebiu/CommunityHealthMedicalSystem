@@ -14,4 +14,7 @@ public interface MedicalStaffRepository extends JpaRepository<MedicalStaff, Long
     List<MedicalStaff> findBySpecializationContainsIgnoreCase(String specialization);
     List<MedicalStaff> findByRoleContains(MedicalStaff.Role role);
     List<MedicalStaff> findByDepartmentId(Long departmentId);
+    boolean existsByEmailAndIdNot(String email, Long id);
+    boolean existsByLicenseNumberAndIdNot(String licenseNumber, Long id);
+
  }

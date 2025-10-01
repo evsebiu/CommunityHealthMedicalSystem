@@ -107,20 +107,47 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
     }
 
     @Override
-    public MedicalStaff updateStaff(MedicalStaffDTO medicalStaffDTO) {
+    public MedicalStaffDTO updateStaff(MedicalStaffDTO medicalStaffDTO) {
 
         // 1. find existing Medical Staff.
         MedicalStaff existingStaff = medicalStaffRepo.findById(medicalStaffDTO.getId())
-                .orElseThrow(()-> new ResourceNotFound("Medical Staff not found."));
+                .orElseThrow(() -> new ResourceNotFound("Medical Staff not found."));
 
         // 2. validate input
 
-        if (medicalStaffDTO == null){
+        if (medicalStaffDTO == null) {
             throw new IllegalArgumentException("Medical staff cannot be null.");
         }
 
-        // 3. update fields from DTO
+        //3. check if email exists
+        if (!existingStaff.getEmail().equals(medicalStaffDTO.getEmail())) {
+            boolean emailExists = medicalStaffRepo.existsByEmailAndIdNot(medicalStaffDTO.getEmail(), existingStaff.getId());
+            if (emailExists) {
+                throw new IllegalArgumentException("Email is already taken by another staff member.");
+            }
+        }
 
+        //4. check if License number is taken or used by another staff member.
+        if (!existingStaff.getLicenseNumber().equals(medicalStaffDTO.getLicenseNumber())) {
+            boolean licenseNumberExists = medicalStaffRepo.existsByLicenseNumberAndIdNot(medicalStaffDTO.getLicenseNumber(), existingStaff.getId());
+            if (licenseNumberExists) {
+                throw new IllegalArgumentException("License number is in use by another staff member.");
+            }
+        }
+
+    // update only allowed fields.
+        existingStaff.setEmail(medicalStaffDTO.getEmail());
+        existingStaff.setFirstName(medicalStaffDTO.getFirstName());
+        existingStaff.setLastName(medicalStaffDTO.getLastName());
+        existingStaff.setRole(medicalStaffDTO.getRole());
+        existingStaff.setLicenseNumber(medicalStaffDTO.getLicenseNumber());
+
+
+    //save entity
+    MedicalStaff updatedStaff = medicalStaffRepo.save(existingStaff);
+        return
+
+    convertToDTO(updatedStaff);
     }
 
 

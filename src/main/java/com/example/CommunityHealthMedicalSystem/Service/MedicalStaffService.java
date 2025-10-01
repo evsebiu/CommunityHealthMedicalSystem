@@ -22,5 +22,5 @@ Optional<MedicalStaff> getMedicalStaffById(Long id);
 
 MedicalStaff createStaff(MedicalStaff medicalStaff);
 void deleteStaff(Long id, MedicalStaff deletingStaff);
-MedicalStaff updateStaff(MedicalStaffDTO medicalStaffDTO);
+MedicalStaffDTO updateStaff(MedicalStaffDTO medicalStaffDTO);
 }
