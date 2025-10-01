@@ -1,6 +1,7 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
 
+import com.example.CommunityHealthMedicalSystem.DTO.MedicalStaffDTO;
 import com.example.CommunityHealthMedicalSystem.Model.Department;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import org.springframework.stereotype.Service;
@@ -21,5 +22,5 @@ Optional<MedicalStaff> getMedicalStaffById(Long id);
 
 MedicalStaff createStaff(MedicalStaff medicalStaff);
 void deleteStaff(Long id, MedicalStaff deletingStaff);
-MedicalStaff updateStaff(Long id, MedicalStaff medicalStaffDetails, Department department);
+MedicalStaff updateStaff(MedicalStaffDTO medicalStaffDTO);
 }

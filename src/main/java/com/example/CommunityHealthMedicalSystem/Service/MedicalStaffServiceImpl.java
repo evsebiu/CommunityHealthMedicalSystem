@@ -1,9 +1,11 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
+import com.example.CommunityHealthMedicalSystem.DTO.MedicalStaffDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
 import com.example.CommunityHealthMedicalSystem.Model.Department;
+import com.example.CommunityHealthMedicalSystem.Model.MedicalRecord;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
 import org.springframework.stereotype.Service;
@@ -105,54 +107,24 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
     }
 
     @Override
-    public MedicalStaff updateStaff(Long id, MedicalStaff medicalStaffDetails, Department department) {
-        if (id == null) {
-            throw new IllegalArgumentException("Personal ID cannot be null.");
-        }
-        if (medicalStaffDetails == null) {
-            throw new IllegalArgumentException("Medical Staff field cannot be null.");
-        }
-        if (department == null) {
-            throw new IllegalArgumentException("Department cannot be null before update," +
-                    " create medical staff first.");
+    public MedicalStaff updateStaff(MedicalStaffDTO medicalStaffDTO) {
+
+        // 1. find existing Medical Staff.
+        MedicalStaff existingStaff = medicalStaffRepo.findById(medicalStaffDTO.getId())
+                .orElseThrow(()-> new ResourceNotFound("Medical Staff not found."));
+
+        // 2. validate input
+
+        if (medicalStaffDTO == null){
+            throw new IllegalArgumentException("Medical staff cannot be null.");
         }
 
-        MedicalStaff existingStaff = medicalStaffRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFound("Medical Personal with ID: " + id + " not found."));
+        // 3. update fields from DTO
 
-        if (medicalStaffDetails.getEmail() != null &&
-                !medicalStaffDetails.getEmail().equals(existingStaff.getEmail())) {
-            medicalStaffRepo.findByEmailContainsIgnoreCase(medicalStaffDetails.getEmail())
-                    .ifPresent(s -> {
-                        throw new DuplicateResourceException("Email '" + medicalStaffDetails.getEmail() +
-                                "' is already in use by another staff member.");
-                    });
-            existingStaff.setEmail(medicalStaffDetails.getEmail());
-
-
-            if (medicalStaffDetails.getLicenseNumber() != null &&
-                    !medicalStaffDetails.getLicenseNumber().equals(existingStaff.getLicenseNumber())) {
-                medicalStaffRepo.findByLicenseNumber(medicalStaffDetails.getLicenseNumber())
-                        .ifPresent(s -> {
-                            throw new DuplicateResourceException("License number " + medicalStaffDetails.getLicenseNumber() +
-                                    "is already in use by another staff member");
-                        });
-            }
-            if (medicalStaffDetails.getFirstName() != null) {
-                medicalStaffDetails.setFirstName(medicalStaffDetails.getFirstName());
-            }
-            if (medicalStaffDetails.getLastName() != null) {
-                medicalStaffDetails.setLastName(medicalStaffDetails.getLastName());
-            }
-            if (medicalStaffDetails.getSpecialization() != null) {
-                medicalStaffDetails.setSpecialization(medicalStaffDetails.getSpecialization());
-            }
-            if (medicalStaffDetails.getRole() != null) {
-                medicalStaffDetails.setRole(medicalStaffDetails.getRole());
-            }
-        }
-        return medicalStaffRepo.save(medicalStaffDetails);
     }
+
+
+
     @Override
     public void deleteStaff(Long id, MedicalStaff deletingStaff){
         if (deletingStaff == null){
@@ -168,5 +140,19 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
             throw new IllegalArgumentException("Staff cannot delete their own profile.");
         }
         medicalStaffRepo.delete(staffToDelete);
+    }
+
+    public MedicalStaffDTO convertToDTO(MedicalStaff medicalStaff){
+        MedicalStaffDTO dto = new MedicalStaffDTO();
+        dto.setId(medicalStaff.getId());
+        dto.setFirstName(medicalStaff.getFirstName());
+        dto.setLastName(medicalStaff.getLastName());
+        dto.setRole(medicalStaff.getRole());
+        dto.setEmail(medicalStaff.getEmail());
+        dto.setSpecialization(medicalStaff.getSpecialization());
+        dto.setLicenseNumber(medicalStaff.getLicenseNumber());
+        dto.setDepartmentId(medicalStaff.getDepartment().getId());
+
+        return dto;
     }
 }
