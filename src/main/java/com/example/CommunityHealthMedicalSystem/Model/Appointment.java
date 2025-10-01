@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
 @Entity
 @Table(name = "appointments")
 
@@ -33,6 +34,7 @@ public class Appointment {
     private Status status;
 
     private String reason;
+
     private String notes;
 
     @NotNull(message = "Appointment duration is required.")

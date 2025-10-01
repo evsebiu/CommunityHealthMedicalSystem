@@ -33,6 +33,8 @@ public class AppointmentDTO {
     @Size(max = 500, message = "Reason cannot exceed 500 characters.")
     private String reason;
 
+    @NotBlank(message = "Appointment notes are required.")
+    @Size(max = 1500, message = "Appointment notes cannot exceed 1.500 characters.")
     private String notes;
 
     @NotNull(message = "Appointment duration is required.")
