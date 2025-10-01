@@ -1,51 +1,51 @@
-# 🏥 Community Health Medical System
+Community Health Medical System
 
-A full-stack backend system built with Java and Spring Boot to manage medical staff, departments, and appointments in a healthcare environment.
+A Spring Boot application for managing patients, doctors, departments, and appointments in a healthcare setting.
+Built with Java 17, Spring Boot, Spring Data JPA, H2/MySQL, and Lombok.
 
-## 🚀 Features
+✨ Features
 
-- Manage doctors, departments, and patient appointments
-- Layered architecture with Entities, Repositories, Services, and Controllers
-- Data Transfer Objects (DTOs) for clean API responses
-- Unit testing with JUnit and Mockito (in progress)
-- Logging and security features (in progress)
+Manage patients, doctors, and departments
 
-## 🔧 Tech Stack
+Schedule and track appointments
 
-- Java 17
-- Spring Boot
-- Spring Data JPA
-- Maven
-- PostgreSQL
-- JUnit 5 & Mockito (for testing)
-- Lombok
+REST API with DTOs for clean responses
 
-## 📁 Project Structure
+Database support: H2 (dev) and MySQL (prod)
 
-com.evse.medicalsystem
-├── controller # REST API endpoints (WIP)
-├── dto # Data Transfer Objects (WIP)
-├── entity # JPA entities
-├── repository # Spring Data repositories
-├── service # Business logic layer
-├── config # Security & application configs (coming)
+Service–Repository–Controller architecture
+
+Work in progress: security, logging, and tests
+
+🚀 Getting Started
+Prerequisites
+
+Java 17+
+
+Maven
+
+(Optional) MySQL
 
 
-## 🧪 Testing(coming)
+Database
 
-- Unit tests will cover service and controller layers
-- Focus on both happy paths and edge cases
+Default: H2 (in-memory, auto-configured)
 
-## 🛡️ Security
+To use MySQL: update application.properties
 
-- Planned: role-based access control with Spring Security
+📌 Roadmap
 
-## 📝 Status
+ Complete DTO mapping
 
-🟢 Core business logic and structure complete  
-🟡 DTOs, Controllers, Unit Testing, and Logging/Security in progress
+ Add unit & integration tests
 
-## 🧑‍💻 Author
+ Role-based security with Spring Security
 
-- Built by [@evsebiu](https://github.com/evsebiu) as a learning project
+ Centralized logging & error handling
 
+ API docs (Swagger / OpenAPI)
+
+📖 License
+
+This project is under the MIT License. (do whatever you want, but don’t sue me)
+built with ❤️ by @evsebiu
