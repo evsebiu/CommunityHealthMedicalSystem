@@ -92,7 +92,7 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
     @Override
     public MedicalStaffDTO createStaff(MedicalStaffDTO medicalStaffDTO) {
         if (medicalStaffDTO == null) {
-            throw new IllegalArgumentException("Medical Staff details are requierd.");
+            throw new IllegalArgumentException("Medical Staff details are required.");
         }
 
 
@@ -168,9 +168,7 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
 
     //save entity
     MedicalStaff updatedStaff = medicalStaffRepo.save(existingStaff);
-        return
-
-    convertToDTO(updatedStaff);
+        return convertToDTO(updatedStaff);
     }
 
 

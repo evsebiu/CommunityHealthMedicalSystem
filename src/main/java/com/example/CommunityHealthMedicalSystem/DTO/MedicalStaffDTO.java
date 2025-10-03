@@ -14,11 +14,11 @@ public class MedicalStaffDTO {
     private Long id;
 
     @NotBlank(message = "First name is required.")
-    @Size(max = 50, message = "First name cannot exceed 50 characters.")
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters.")
     private String firstName;
 
     @NotBlank(message = "Last name is required.")
-    @Size(max = 50, message = "Last name cannot exceed 50 characters.")
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters.")
     private String lastName;
 
     @Email(message = "E-mail should be valid.")

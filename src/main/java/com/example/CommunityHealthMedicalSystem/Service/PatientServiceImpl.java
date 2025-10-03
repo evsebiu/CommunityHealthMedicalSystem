@@ -1,5 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
+import com.example.CommunityHealthMedicalSystem.DTO.PatientDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
@@ -14,7 +15,8 @@ import java.util.Optional;
 
 @Service
 public class PatientServiceImpl implements PatientService{
-    @Autowired
+
+
     private final PatientRepository patientRepo;
     public PatientServiceImpl(PatientRepository patientRepo){
         this.patientRepo = patientRepo;
@@ -85,24 +87,47 @@ public class PatientServiceImpl implements PatientService{
     }
 
     @Override
-    public Patient createPatient(Patient patient){
-        if (patient==null){
-            throw new IllegalArgumentException("Patient details are requied.");
+    public PatientDTO createPatient(PatientDTO patientDTO){
+
+
+        // input validations.
+        if (patientDTO == null){
+            throw new IllegalArgumentException("Patient's details are required.");
         }
-        if (patient.getNationalId() != null && patientRepo.findByNationalId(patient.getNationalId())
-                .isPresent() ){
-            throw new DuplicateResourceException("Patient already exists in database.");
+
+
+        // check if email, phone number and national field from Patient class already exists in db.
+        if (patientDTO.getEmail() != null && patientRepo.findByEmail(patientDTO.getEmail()).isPresent()){
+            throw new DuplicateResourceException("Error! This email already exists in database.");
         }
-        if (patient.getPhoneNumber() != null && patientRepo.findByPhoneNumber(patient.getPhoneNumber())
-                .isPresent()){
-            throw new DuplicateResourceException("Patient phone number already exists in database");
+
+        if (patientDTO.getNationalId() != null && patientRepo.findByNationalId(patientDTO.getNationalId()).isPresent()){
+            throw new DuplicateResourceException("Error! Patient's National ID already exists in database.");
         }
-        if (patient.getEmail() != null && patientRepo.findByEmail(patient.getEmail())
-                .isPresent()){
-            throw new DuplicateResourceException("Patient email alreadt exists in database.");
+
+        if (patientDTO.getPhoneNumber()!= null && patientRepo.findByPhoneNumber(patientDTO.getPhoneNumber()).isPresent()){
+            throw new IllegalArgumentException("Error! Patient's phone numver already exists in database.");
         }
-        return patientRepo.save(patient);
+
+        // convert DTO to entity
+
+        Patient patient  = new Patient();
+        patient.setAddress(patientDTO.getAddress());
+        patient.setEmail(patientDTO.getEmail());
+        patient.setNationalId(patientDTO.getNationalId());
+        patient.setLastName(patientDTO.getLastName());
+        patient.setFirstName(patientDTO.getFirstName());
+        patient.setDateOfBirth(patientDTO.getDateOfBirth());
+        patient.setPhoneNumber(patientDTO.getPhoneNumber());
+
+
+        //save and return.
+
+        Patient newPatient = patientRepo.save(patient);
+        return convertToDTO(newPatient);
+
     }
+
 
 
 
@@ -118,54 +143,55 @@ public class PatientServiceImpl implements PatientService{
     }
 
     @Override
-    public Patient updatePatient(Long id, Patient patientDetails){
-        if (id == null){
-            throw new IllegalArgumentException("Patient ID cannot be null");
-        }
-        if (patientDetails == null){
-            throw new IllegalArgumentException("Patient detials are required for update.");
-        }
-        Patient existingPatient = patientRepo.findById(id)
-                .orElseThrow(()-> new ResourceNotFound("Patiend not found in database"));
+    public PatientDTO updatePatient(PatientDTO patientDTO){
+        // 1. find existing Patient.
+        Patient existingPatient = patientRepo.findById(patientDTO.getId())
+                .orElseThrow(()-> new ResourceNotFound("Patient not found."));
 
-        if (patientDetails.getEmail() != null &&
-        !patientDetails.getEmail().equals(existingPatient.getEmail())){
-            patientRepo.findByEmail(patientDetails.getEmail())
-                    .ifPresent(s->{
-                        throw new DuplicateResourceException("Email " + patientDetails.getEmail()
-                        + " already exits in database");
-                    });
+        //2. validate Input
+        if (patientDTO == null){
+            throw new IllegalArgumentException("Patient cannot be null.");
+        }
+
+        //3. check if patient's email exists.
+        if (!existingPatient.getEmail().equals(patientDTO.getEmail())){
+            boolean emailExists = patientRepo.existsByEmailAndIdNot(patientDTO.getEmail(), patientDTO.getId());
+            if (emailExists){
+                throw new IllegalArgumentException("Email is already taken by another patient.");
             }
-        existingPatient.setEmail(patientDetails.getEmail());
-
-
-        if (patientDetails.getNationalId() != null &&
-        !patientDetails.getNationalId().equals(existingPatient.getNationalId())) {
-            patientRepo.findByNationalId(patientDetails.getNationalId())
-                    .ifPresent(s -> {
-                        throw new DuplicateResourceException("Patient national ID " +
-                                patientDetails.getNationalId() + " already exists in database.");
-                    });
         }
-        if (patientDetails.getPhoneNumber() != null &&
-        !patientDetails.getPhoneNumber().equals(existingPatient.getPhoneNumber())){
-            patientRepo.findByPhoneNumber(patientDetails.getPhoneNumber())
-                    .ifPresent(s->{
-                        throw new DuplicateResourceException("Patient with phone number "
-                        + patientDetails.getPhoneNumber() + " already exists in system.");
-                    });
+        if (!existingPatient.getNationalId().equals(patientDTO.getNationalId())){
+            boolean nationalExists = patientRepo.existsByNationalIdAndIdNot(patientDTO.getNationalId(), patientDTO.getId());
+            if (nationalExists){
+                throw new IllegalArgumentException("National ID is owned by another patient.");
             }
-        existingPatient.setPhoneNumber(patientDetails.getPhoneNumber());
+        }
 
-        if (patientDetails.getFirstName() !=null){
-            existingPatient.setFirstName(patientDetails.getFirstName());
-        }
-        if (patientDetails.getLastName() != null){
-            existingPatient.setLastName(patientDetails.getLastName());
-        }
-        if (patientDetails.getAddress() != null){
-            existingPatient.setAddress(patientDetails.getAddress());
-        }
-        return patientRepo.save(existingPatient);
+        // update only allowed fields.
+
+        existingPatient.setFirstName(patientDTO.getFirstName());
+        existingPatient.setLastName(patientDTO.getLastName());
+        existingPatient.setEmail(patientDTO.getEmail());
+        existingPatient.setPhoneNumber(patientDTO.getPhoneNumber());
+        existingPatient.setAddress(patientDTO.getAddress());
+
+        //save entity
+        Patient updatedPatient = patientRepo.save(existingPatient);
+        return convertToDTO(updatedPatient);
+
+    }
+
+    public PatientDTO convertToDTO(Patient patient){
+        PatientDTO dto = new PatientDTO();
+        dto.setId(patient.getId());
+        dto.setAddress(patient.getAddress());
+        dto.setEmail(patient.getEmail());
+        dto.setDateOfBirth(patient.getDateOfBirth());
+        dto.setNationalId(patient.getNationalId());
+        dto.setFirstName(patient.getFirstName());
+        dto.setLastName(patient.getLastName());
+        dto.setPhoneNumber(patient.getPhoneNumber());
+
+        return dto;
     }
 }

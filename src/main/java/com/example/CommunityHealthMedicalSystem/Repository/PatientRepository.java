@@ -15,5 +15,7 @@ public interface PatientRepository extends JpaRepository<Patient,Long> {
     Optional<Patient> findByNationalId(String nationalId);
     List<Patient> findByDateOfBirth(LocalDate dateOfBirth);
     List<Patient> findByAddress(String address);
+    boolean existsByEmailAndIdNot(String email, Long id);
+    boolean existsByNationalIdAndIdNot(String nationalId, Long id);
 
 }

@@ -32,22 +32,22 @@ public class Patient {
     private String lastName;
 
     @Column(unique = true)
-    @NotNull(message = "Email is required")
+    @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
 
     @Column(unique = true)
-    @NotNull(message = "Phone number is required")
+    @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
     @Column(unique = true)
-    @NotNull(message = "National ID is required")
+    @NotBlank(message = "National ID is required")
     private String nationalId;
 
     @NotNull(message = "Date of birth required")
     private LocalDate dateOfBirth;
 
-    @NotNull(message = "Address is required")
+    @NotBlank(message = "Address is required")
     private String address;
 
     @OneToMany(mappedBy = "patient", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)

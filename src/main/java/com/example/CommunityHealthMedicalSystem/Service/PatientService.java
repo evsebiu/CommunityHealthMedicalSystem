@@ -1,5 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.Service;
 
+import com.example.CommunityHealthMedicalSystem.DTO.PatientDTO;
 import com.example.CommunityHealthMedicalSystem.Model.Appointment;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Model.Patient;
@@ -20,8 +21,8 @@ public interface PatientService {
     List<Patient> findByDateOfBirth(LocalDate dateOfBirth);
     List<Patient> findByAddressIgnoreCase(String address);
 
-    Patient createPatient(Patient patient);
+    PatientDTO createPatient(PatientDTO patientDTO);
     void deletePatient (Long id);
-    Patient updatePatient(Long id,Patient patientDetails);
+    PatientDTO updatePatient(PatientDTO patientDTO);
 
 }
