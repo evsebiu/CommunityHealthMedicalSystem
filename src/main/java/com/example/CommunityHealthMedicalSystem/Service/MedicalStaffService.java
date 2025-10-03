@@ -20,7 +20,7 @@ List<MedicalStaff> getByRoleIgnoreCase(MedicalStaff.Role role);
 List<MedicalStaff> getByDepartment(Long departmentId);
 Optional<MedicalStaff> getMedicalStaffById(Long id);
 
-MedicalStaff createStaff(MedicalStaff medicalStaff);
+MedicalStaffDTO createStaff(MedicalStaffDTO medicalStaffDTO);
 void deleteStaff(Long id, MedicalStaff deletingStaff);
 MedicalStaffDTO updateStaff(MedicalStaffDTO medicalStaffDTO);
 }

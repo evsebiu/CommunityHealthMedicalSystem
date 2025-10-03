@@ -7,6 +7,7 @@ import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
 import com.example.CommunityHealthMedicalSystem.Model.Department;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalRecord;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
+import com.example.CommunityHealthMedicalSystem.Repository.DepartmentRepository;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +18,10 @@ import java.util.Optional;
 public class MedicalStaffServiceImpl implements MedicalStaffService {
 
     private final MedicalStaffRepository medicalStaffRepo;
-
-    MedicalStaffServiceImpl(MedicalStaffRepository medicalStaffRepo) {
+    private final DepartmentRepository departmentRepo;
+    MedicalStaffServiceImpl(MedicalStaffRepository medicalStaffRepo, DepartmentRepository departmentRepo) {
         this.medicalStaffRepo = medicalStaffRepo;
+        this.departmentRepo=departmentRepo;
     }
 
     @Override
@@ -88,22 +90,43 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
     }
 
     @Override
-    public MedicalStaff createStaff(MedicalStaff medicalStaff) {
-        if (medicalStaff == null) {
+    public MedicalStaffDTO createStaff(MedicalStaffDTO medicalStaffDTO) {
+        if (medicalStaffDTO == null) {
             throw new IllegalArgumentException("Medical Staff details are requierd.");
         }
 
 
-        if (medicalStaff.getEmail() != null && medicalStaffRepo.findByEmailContainsIgnoreCase(
-                medicalStaff.getEmail()).isPresent()) {
+        if (medicalStaffDTO.getEmail() != null && medicalStaffRepo.findByEmailContainsIgnoreCase(
+                medicalStaffDTO.getEmail()).isPresent()) {
             throw new DuplicateResourceException("Error! This person already exits in database.");
         }
-        if (medicalStaff.getLicenseNumber() != null && medicalStaffRepo.findByLicenseNumber(
-                medicalStaff.getLicenseNumber()).isPresent()) {
+        if (medicalStaffDTO.getLicenseNumber() != null && medicalStaffRepo.findByLicenseNumber(
+                medicalStaffDTO.getLicenseNumber()).isPresent()) {
             throw new DuplicateResourceException("A staff member with this License Number already" +
                     "exists in database.");
         }
-        return medicalStaffRepo.save(medicalStaff);
+
+        // convert DTO to entity
+        MedicalStaff medicalStaff = new MedicalStaff();
+        medicalStaff.setLicenseNumber(medicalStaffDTO.getLicenseNumber());
+        medicalStaff.setEmail(medicalStaffDTO.getEmail());
+        medicalStaff.setRole(medicalStaffDTO.getRole());
+        medicalStaff.setLastName(medicalStaffDTO.getLastName());
+        medicalStaff.setFirstName(medicalStaffDTO.getFirstName());
+        medicalStaff.setSpecialization(medicalStaffDTO.getSpecialization());
+
+        // handle department
+        if (medicalStaffDTO.getDepartmentId() != null){
+            Department department = departmentRepo.findById(medicalStaffDTO.getDepartmentId())
+                    .orElseThrow(()-> new ResourceNotFound("Department not found with id + " +
+                            medicalStaffDTO.getDepartmentId()));
+            medicalStaff.setDepartment(department);
+        } else {
+            throw new IllegalArgumentException("Department ID is required");
+        }
+
+        MedicalStaff savedStaff = medicalStaffRepo.save(medicalStaff);
+        return convertToDTO(savedStaff);
     }
 
     @Override
