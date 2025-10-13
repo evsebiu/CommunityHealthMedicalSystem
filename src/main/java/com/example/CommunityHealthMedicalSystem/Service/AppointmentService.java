@@ -24,12 +24,13 @@ public interface AppointmentService {
     List<Appointment> getAppointmentsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     List<Appointment> getAppointmentByPatientId(Long patientId);
     List<Appointment> getAppointmentByMedicalId(Long medicalId);
-
+    List<Appointment> searchAppointments(AppointmentDTO appointmentDTO);
 
     //business logic
     AppointmentDTO createAppointment(AppointmentDTO appointmentDTO);
     void deleteAppointment(Long id,Patient patient, MedicalStaff medicalStaff);
     AppointmentDTO updateAppointment(Long id, AppointmentDTO appointmentDTO);
+
 
 
     //validation methods

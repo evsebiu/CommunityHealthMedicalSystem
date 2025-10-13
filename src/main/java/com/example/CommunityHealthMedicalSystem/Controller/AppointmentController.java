@@ -1,5 +1,6 @@
 package com.example.CommunityHealthMedicalSystem.Controller;
 
+import com.example.CommunityHealthMedicalSystem.DTO.AppointmentDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Model.Appointment;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
@@ -98,13 +99,17 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<Appointment> createAppointment(@RequestBody @Valid Appointment appointment){
+    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody AppointmentDTO appointmentDTO){
         try {
-            Appointment savedAppointment = appointmentService.createAppointment(appointment);
+            AppointmentDTO savedAppointment = appointmentService.createAppointment(appointmentDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedAppointment);
         } catch (DuplicateResourceException e){
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Appointment>> searchAppointment(@RequestParam(required = false) String reason )
+
 
 }
