@@ -30,8 +30,6 @@ public class AppointmentServiceImpl implements AppointmentService{
     @Autowired
     private final MedicalStaffRepository medicalStaffRepo;
 
-    private AppointmentService appointmentService;
-
     public AppointmentServiceImpl(AppointmentRepository appointmentRepo, PatientRepository patientRepo,
                                   MedicalStaffRepository medicalStaffRepo){
         this.appointmentRepo = appointmentRepo;
@@ -256,10 +254,5 @@ public class AppointmentServiceImpl implements AppointmentService{
             dto.setDepartmentId(appointment.getDepartment().getId());
         }
        return dto;
-    }
-
-    @Override
-    public List<Appointment> searchAppointment(AppointmentDTO appointmentDTO){
-        Specification<Appointment> specification = Specification.where(null);
     }
 }
