@@ -12,11 +12,11 @@ import java.util.Optional;
 public interface DepartmentService {
     Optional<Department> getDepartmentById(Long id);
     Optional<Department> getDepartmentByNameIgnoreCase(String name);
-    List<Department> getDepartmentByMedicalStaff(MedicalStaff medicalStaff);
+    List<Department> getDepartmentByMedicalStaff(Long medicalStaffId);
     List<Department> getAllDepartments();
 
     DepartmentDTO createDepartment(DepartmentDTO departmentDTO);
-    DepartmentDTO updateDepartment(Long id, DepartmentDTO departmentDTO);
+    DepartmentDTO updateDepartmentName(Long id, DepartmentDTO departmentDTO);
     void deleteDepartment(Long id);
 
     List<MedicalStaff> getMedicalStaffByDepartment(Long departmentId);

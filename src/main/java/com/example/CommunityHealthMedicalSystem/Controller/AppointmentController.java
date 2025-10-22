@@ -1,6 +1,7 @@
 package com.example.CommunityHealthMedicalSystem.Controller;
 
 import com.example.CommunityHealthMedicalSystem.DTO.AppointmentDTO;
+import com.example.CommunityHealthMedicalSystem.Exception.ConflictException;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
@@ -10,6 +11,7 @@ import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
 import com.example.CommunityHealthMedicalSystem.Repository.PatientRepository;
 import com.example.CommunityHealthMedicalSystem.Service.AppointmentServiceImpl;
+import com.sun.net.httpserver.HttpsServer;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +41,24 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public List<Appointment> getAllAppointments() {
-        return appointmentService.getAllAppointments();
+    public ResponseEntity<List<Appointment>> getAllAppointments() {
+        try {
+            List<Appointment> appointments = appointmentService.getAllAppointments();
+            return ResponseEntity.ok(appointments);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id){
+        try {
+            Optional<Appointment> appointments = appointmentService.getAppointmentById(id);
+            return appointments.map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/reason/{reason}")
@@ -61,12 +79,25 @@ public class AppointmentController {
         return ResponseEntity.ok(appointments);
     }
 
+    @GetMapping("/by-patient")
+    public ResponseEntity<List<Appointment>>  getAppointmentByPatient(@RequestBody Patient patient){
+        List<Appointment> appointments = appointmentService.getAppointmentByPatient(patient);
+        return ResponseEntity.ok(appointments);
+    }
+
     @GetMapping("/by-patient/{patientId}")
     public ResponseEntity<List<Appointment>> getAppointmentByPatientId(@PathVariable Long patientId) {
         List<Appointment> appointments = appointmentService.getAppointmentByPatientId(patientId);
         if (appointments.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(appointments);
+    }
+
+
+    @GetMapping("/by-medical-staff")
+    public ResponseEntity<List<Appointment>> getAppointmentByMedicalStaff(@RequestBody MedicalStaff medicalStaff){
+        List<Appointment> appointments = appointmentService.getAppointmentByMedicalStaff(medicalStaff);
         return ResponseEntity.ok(appointments);
     }
 
@@ -93,16 +124,12 @@ public class AppointmentController {
             @RequestParam("startDate") LocalDateTime startDate,
             @RequestParam("endDate") LocalDateTime endDate
     ) {
-        List<Appointment> appointments = appointmentService.getAppointmentsByDateRange(startDate, endDate);
-        return ResponseEntity.ok(appointments);
-    }
-
-
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id) {
-        Optional<Appointment> appointment = appointmentService.getAppointmentById(id);
-        return appointment.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            List<Appointment> appointments = appointmentService.getAppointmentsByDateRange(startDate, endDate);
+            return ResponseEntity.ok(appointments);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping
@@ -112,13 +139,19 @@ public class AppointmentController {
             return ResponseEntity.status(HttpStatus.CREATED).body(savedAppointment);
         } catch (DuplicateResourceException e) {
             return ResponseEntity.badRequest().build();
+        } catch (ResourceNotFound e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (ConflictException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<AppointmentDTO> updateAppointmentStatus(@PathVariable Long id, @RequestParam Appointment.Status status) {
         try {
-            // create a DTO with just the satus update
+            // create a DTO with just the status update
             AppointmentDTO updateDTO = new AppointmentDTO();
             updateDTO.setStatus(status);
 
@@ -161,6 +194,10 @@ public class AppointmentController {
             return ResponseEntity.ok(updateAppointment);
         } catch (ResourceNotFound e){
             return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        } catch (ConflictException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 }

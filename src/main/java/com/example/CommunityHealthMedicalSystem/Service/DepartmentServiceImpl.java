@@ -37,11 +37,11 @@ public class DepartmentServiceImpl implements DepartmentService{
     }
 
     @Override
-    public List<Department> getDepartmentByMedicalStaff(MedicalStaff medicalStaff){
-        if (medicalStaff == null){
+    public List<Department> getDepartmentByMedicalStaff(Long medicalStaffId){
+        if (medicalStaffId == null){
             throw new IllegalArgumentException("Medical staff cannot be null.");
         }
-        return departmentRepo.findByMedicalStaffs(medicalStaff);
+        return departmentRepo.findByMedicalStaffs(medicalStaffId);
     }
     @Override
     public DepartmentDTO createDepartment(DepartmentDTO departmentDTO){
@@ -64,7 +64,7 @@ public class DepartmentServiceImpl implements DepartmentService{
     }
 
     @Override
-    public DepartmentDTO updateDepartment(Long id, DepartmentDTO departmentDTO){
+    public DepartmentDTO updateDepartmentName(Long id, DepartmentDTO departmentDTO){
         // 1.find existing appointment.
         Department department = departmentRepo.findById(id)
                 .orElseThrow(()-> new ResourceNotFound("Department with id:" +
