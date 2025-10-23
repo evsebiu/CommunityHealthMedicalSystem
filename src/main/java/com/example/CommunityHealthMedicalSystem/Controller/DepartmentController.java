@@ -15,8 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/departments")
@@ -71,25 +70,35 @@ public class DepartmentController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Department>> searchDepartmentByName(@RequestParam(required = false) String name){
+    public ResponseEntity<?> searchDepartmentByName(@RequestParam(required = false) String name){
         try {
-            List<Department> departments;
+            if (name != null && !name.trim().isEmpty()) {
+                Optional<Department> department = departmentRepo.findByNameIgnoreCase(name.trim());
 
-            if (name !=null && !name.trim().isEmpty()){
-                departments = departmentRepo.findByNameIgnoreCase(name);
+                if (department.isPresent()) {
+                    return ResponseEntity.ok(Collections.singleton(department.get()));
+                } else {
+                    Map<String, String> response = new HashMap<>();
+                    response.put("message", "Department not found with name" + name);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                }
             } else {
-                departments = departmentService.getAllDepartments();
+                //return all departments if name not provided.
+                List<Department> allDepartments = departmentRepo.findAll();
+
+                if (allDepartments.isEmpty()) {
+                    Map<String, String> response = new HashMap<>();
+                    response.put("message", "No departments found in system.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                }
+                return ResponseEntity.ok(allDepartments);
             }
 
-            if (departments.isEmpty()){
-                return ResponseEntity.notFound().build();
-            }
-
-            return ResponseEntity.ok(departments);
         } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, String> errorMessage = new HashMap<>();
+            errorMessage.put("error", "Search failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
-
     }
 
     @PostMapping
@@ -113,7 +122,7 @@ public class DepartmentController {
             updateDepartmentName.setName(name);
 
             // save updated
-            DepartmentDTO updatedDepartment = departmentService.updateDepartmentName(id, updateDepartmentName);
+            DepartmentDTO updatedDepartment = departmentService.updateDepartment(id, updateDepartmentName);
             return ResponseEntity.ok(updatedDepartment);
         } catch (ResourceNotFound e){
             return ResponseEntity.notFound().build();
@@ -128,7 +137,7 @@ public class DepartmentController {
             @PathVariable Long id,
             @RequestBody @Valid DepartmentDTO departmentDTO){
         try{
-            DepartmentDTO updateDepartment = departmentService.updateDepartmentName(id, departmentDTO);
+            DepartmentDTO updateDepartment = departmentService.updateDepartment(id, departmentDTO);
             return ResponseEntity.ok(updateDepartment);
         } catch (ResourceNotFound e){
             return ResponseEntity.notFound().build();

@@ -25,6 +25,11 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
     }
 
     @Override
+    public List<MedicalStaff> getAllMedicalStaff(){
+        return medicalStaffRepo.findAll();
+    }
+
+    @Override
     public List<MedicalStaff> getByFirstNameIgnoreCase(String firstName) {
         if (firstName == null) {
             throw new IllegalArgumentException("First name field is required.");
@@ -130,7 +135,7 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
     }
 
     @Override
-    public MedicalStaffDTO updateStaff(MedicalStaffDTO medicalStaffDTO) {
+    public MedicalStaffDTO updateStaff(Long id, MedicalStaffDTO medicalStaffDTO) {
 
         // 1. find existing Medical Staff.
         MedicalStaff existingStaff = medicalStaffRepo.findById(medicalStaffDTO.getId())

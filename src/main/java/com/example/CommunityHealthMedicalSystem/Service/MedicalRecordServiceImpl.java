@@ -2,6 +2,7 @@ package com.example.CommunityHealthMedicalSystem.Service;
 
 
 import com.example.CommunityHealthMedicalSystem.DTO.MedicalRecordDTO;
+import com.example.CommunityHealthMedicalSystem.DTO.MedicalStaffDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
@@ -33,6 +34,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
         this.medicalRecordRepo=medicalRecordRepo;
         this.patientRepo = patientRepo;
         this.medicalStaffRepo=medicalStaffRepo;
+    }
+
+
+    @Override
+    public List<MedicalRecord> getAllMedicalRecords() {
+        return medicalRecordRepo.findAll();
     }
 
     @Override
@@ -166,22 +173,22 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
     }
 
     @Override
-    public void deleteMedicalRecord(Long id, MedicalStaff deletingStaff){
-        if (deletingStaff == null){
+    public void deleteMedicalRecord(Long id, Long medicalStaffId){
+        if (medicalStaffId == null){
             throw new IllegalArgumentException("Deleting staff cannot be null. Field is required.");
         }
 
         MedicalRecord medicalRecord = medicalRecordRepo.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("Medical Record with id: " + id + " not found."));
 
-        if(!medicalRecord.getMedicalStaff().getId().equals(deletingStaff.getId())){
+        if(!medicalRecord.getMedicalStaff().getId().equals(medicalStaffId)){
             throw new SecurityException("Only authorised medical staff can do this operation");
         }
         medicalRecordRepo.delete(medicalRecord);
     }
 
     @Override
-    public MedicalRecordDTO updateMedicalRecord(MedicalRecordDTO medicalRecordDTO){
+    public MedicalRecordDTO updateMedicalRecord(Long id, MedicalRecordDTO medicalRecordDTO){
         // 1. find existing medical record.
         MedicalRecord existingRecord = medicalRecordRepo.findById(medicalRecordDTO.getId())
                 .orElseThrow(()-> new ResourceNotFound("Medical record with ID " + medicalRecordDTO.getId() +

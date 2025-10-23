@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
-    List<Department> findByNameIgnoreCase(String name);
+    Optional<Department> findByNameIgnoreCase(String name);
     List<Department> findByMedicalStaffs(Long medicalStaffId);
 
     @Query("SELECT ms FROM Department d Join d.medicalStaffs ms WHERE d.id= :departmentId")

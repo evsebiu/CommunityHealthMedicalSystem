@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public interface MedicalStaffService {
+public interface MedicalStaffService{
+    List<MedicalStaff> getAllMedicalStaff();
 List<MedicalStaff> getByFirstNameIgnoreCase(String firstName);
 List<MedicalStaff> getByLastNameIgnoreCase(String lastName);
 Optional<MedicalStaff> getByEmailIgnoreCase(String email);

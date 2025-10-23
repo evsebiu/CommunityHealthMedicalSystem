@@ -64,7 +64,7 @@ public class DepartmentServiceImpl implements DepartmentService{
     }
 
     @Override
-    public DepartmentDTO updateDepartmentName(Long id, DepartmentDTO departmentDTO){
+    public DepartmentDTO updateDepartment(Long id, DepartmentDTO departmentDTO){
         // 1.find existing appointment.
         Department department = departmentRepo.findById(id)
                 .orElseThrow(()-> new ResourceNotFound("Department with id:" +
