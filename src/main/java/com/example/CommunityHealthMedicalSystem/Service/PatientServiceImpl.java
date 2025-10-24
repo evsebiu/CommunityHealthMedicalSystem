@@ -22,6 +22,12 @@ public class PatientServiceImpl implements PatientService{
         this.patientRepo = patientRepo;
     }
 
+
+    @Override
+    public List<Patient> getAllPatients(){
+        return patientRepo.findAll();
+    }
+
     @Override
     public Optional<Patient> findById(Long id){
         if (id == null){
@@ -35,7 +41,7 @@ public class PatientServiceImpl implements PatientService{
         if(firstName == null){
             throw new IllegalArgumentException("Patient first name is a required field.");
         }
-        return patientRepo.findByFirstNameContainsIgnoreCase(firstName);
+        return patientRepo.findByFirstNameContainingIgnoreCase(firstName);
     }
 
     @Override
@@ -43,15 +49,15 @@ public class PatientServiceImpl implements PatientService{
         if (lastName == null){
             throw new IllegalArgumentException("Patient last name is required.");
         }
-        return patientRepo.findByLastNameContainsIgnoreCase(lastName);
+        return patientRepo.findByLastNameContainingIgnoreCase(lastName);
     }
 
     @Override
-    public Optional<Patient> findByEmail(String email){
+    public List<Patient> findByEmail(String email){
         if (email == null){
             throw new IllegalArgumentException("Email is a required field. It cannot be null.");
         }
-        return patientRepo.findByEmail(email);
+        return patientRepo.findByEmailContainingIgnoreCase(email);
     }
 
     @Override
@@ -75,7 +81,7 @@ public class PatientServiceImpl implements PatientService{
         if (address == null){
             throw new IllegalArgumentException("Patient address is required.");
         }
-        return patientRepo.findByAddress(address);
+        return patientRepo.findByAddressContainingIgnoreCase(address);
     }
 
     @Override
@@ -97,7 +103,7 @@ public class PatientServiceImpl implements PatientService{
 
 
         // check if email, phone number and national field from Patient class already exists in db.
-        if (patientDTO.getEmail() != null && patientRepo.findByEmail(patientDTO.getEmail()).isPresent()){
+        if (patientDTO.getEmail() != null && patientRepo.findByEmailContainingIgnoreCase(patientDTO.getEmail()).isEmpty()){
             throw new DuplicateResourceException("Error! This email already exists in database.");
         }
 
@@ -143,7 +149,7 @@ public class PatientServiceImpl implements PatientService{
     }
 
     @Override
-    public PatientDTO updatePatient(PatientDTO patientDTO){
+    public PatientDTO updatePatient(Long id, PatientDTO patientDTO){
         // 1. find existing Patient.
         Patient existingPatient = patientRepo.findById(patientDTO.getId())
                 .orElseThrow(()-> new ResourceNotFound("Patient not found."));
@@ -193,5 +199,11 @@ public class PatientServiceImpl implements PatientService{
         dto.setPhoneNumber(patient.getPhoneNumber());
 
         return dto;
+    }
+
+    @Override
+    public List<Patient> searchPatients(String firstName, String lastName, String email,
+                                        String address){
+        return patientRepo.searchPatients(firstName, lastName, email, address);
     }
 }

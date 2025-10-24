@@ -12,10 +12,11 @@ import java.util.Optional;
 
 @Service
 public interface PatientService {
+    List<Patient> getAllPatients();
     Optional<Patient> findById(Long id);
     List<Patient> findByFirstName(String firstName);
     List<Patient> findByLastName(String lastName);
-    Optional<Patient> findByEmail(String email);
+    List<Patient> findByEmail(String email);
     Optional<Patient> findByPhoneNumber(String phoneNumber);
     Optional<Patient> findByNationalId(String nationalId);
     List<Patient> findByDateOfBirth(LocalDate dateOfBirth);
@@ -23,6 +24,8 @@ public interface PatientService {
 
     PatientDTO createPatient(PatientDTO patientDTO);
     void deletePatient (Long id);
-    PatientDTO updatePatient(PatientDTO patientDTO);
+    PatientDTO updatePatient(Long id, PatientDTO patientDTO);
 
+    List<Patient> searchPatients(String firstName, String lastName, String email,
+                                 String address);
 }
