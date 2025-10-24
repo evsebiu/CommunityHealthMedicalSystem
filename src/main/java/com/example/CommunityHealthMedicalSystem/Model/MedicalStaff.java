@@ -50,6 +50,10 @@ public class MedicalStaff {
     @NotNull(message = "Role is required.")
     private Role role;
 
+    public boolean canPerformMedicalOperations() {
+        return role == Role.DOCTOR || role == Role.NURSE || role == Role.TECHNICIAN || role == Role.ADMINISTRATOR;
+    }
+
     @OneToMany(mappedBy = "medicalStaff", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Appointment> appointments = new ArrayList<>();
 
