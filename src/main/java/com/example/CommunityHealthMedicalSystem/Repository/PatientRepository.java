@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface PatientRepository extends JpaRepository<Patient,Long> {
     List<Patient> findByFirstNameContainingIgnoreCase(String firstName);
     List<Patient> findByLastNameContainingIgnoreCase(String lastName);
-    List<Patient> findByEmailContainingIgnoreCase(String email);
+    Optional<Patient> findByEmail(String email);
     Optional<Patient> findByPhoneNumber(String phoneNumber);
     Optional<Patient> findByNationalId(String nationalId);
     List<Patient> findByDateOfBirth(LocalDate dateOfBirth);

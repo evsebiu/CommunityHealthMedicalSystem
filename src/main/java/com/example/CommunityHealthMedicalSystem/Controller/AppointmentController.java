@@ -87,11 +87,16 @@ public class AppointmentController {
 
     @GetMapping("/by-patient/{patientId}")
     public ResponseEntity<List<Appointment>> getAppointmentByPatientId(@PathVariable Long patientId) {
-        List<Appointment> appointments = appointmentService.getAppointmentByPatientId(patientId);
-        if (appointments.isEmpty()) {
+        try {
+
+            List<Appointment> appointments = appointmentService.getAppointmentByPatientId(patientId);
+            return ResponseEntity.ok(appointments);
+        } catch (SecurityException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (ResourceNotFound e){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(appointments);
+
     }
 
 

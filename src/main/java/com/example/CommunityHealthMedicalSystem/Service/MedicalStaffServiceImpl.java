@@ -179,20 +179,14 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
 
 
     @Override
-    public void deleteStaff(Long id, MedicalStaff deletingStaff){
-        if (deletingStaff == null){
-            throw new IllegalArgumentException("Deleting staff cannot be null");
-        }
-        if (id == null){
+    public void deleteStaff(Long id ) {
+        if (id == null) {
             throw new IllegalArgumentException("ID cannot be a null field.");
         }
         MedicalStaff staffToDelete = medicalStaffRepo.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Medical Staff cannot be found based on id."));
-
-        if (staffToDelete.getId().equals(deletingStaff.getId())){
-            throw new IllegalArgumentException("Staff cannot delete their own profile.");
-        }
+                .orElseThrow(()-> new ResourceNotFound("Medical Staff not found."));
         medicalStaffRepo.delete(staffToDelete);
+
     }
 
     public MedicalStaffDTO convertToDTO(MedicalStaff medicalStaff){

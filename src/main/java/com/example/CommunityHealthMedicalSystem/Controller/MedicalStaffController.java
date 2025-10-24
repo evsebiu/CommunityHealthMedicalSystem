@@ -71,10 +71,9 @@ public class MedicalStaffController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMedicalStaff(@PathVariable Long id,
-    @RequestBody MedicalStaff deletingStaff){
+    public ResponseEntity<Void> deleteMedicalStaff(@PathVariable Long id){
         try {
-            medicalStaffService.deleteStaff(id, deletingStaff);
+            medicalStaffService.deleteStaff(id);
             return ResponseEntity.noContent().build();
         } catch (ResourceNotFound e){
             return ResponseEntity.notFound().build();

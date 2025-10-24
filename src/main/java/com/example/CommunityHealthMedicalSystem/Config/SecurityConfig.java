@@ -1,8 +1,9 @@
-package com.example.CommunityHealthMedicalSystem.Security;
+package com.example.CommunityHealthMedicalSystem.Config;
 
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -25,25 +28,38 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // for testing (enable for production)
                 .authorizeHttpRequests(authz-> authz
-                        .requestMatchers("/api/patients/**").permitAll() // allow patients to acces their own
-        // endpoints
+                        // Patient endpoints - more restrictive
+                        .requestMatchers(HttpMethod.GET, "/api/patients/search").hasAnyRole("PATIENT",
+                                "DOCTOR", "NURSE", "ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.GET, "/api/patients/{id}").hasAnyRole("PATIENT",
+                                "DOCTOR", "NURSE", "ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.POST, "/api/patients").permitAll() // Allow registration
+                        .requestMatchers(HttpMethod.PUT, "/api/patients/{id}").hasAnyRole("PATIENT",
+                                "ADMINISTRATOR") // Patients can update own info
+                        .requestMatchers(HttpMethod.DELETE, "/api/patients/**").hasRole("ADMINISTRATOR")
 
+                        // Appointment endpoints - patients can only access their own
+                        .requestMatchers(HttpMethod.GET, "/api/appointments/patient/{patientId}").hasAnyRole("PATIENT",
+                                "DOCTOR", "NURSE", "ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.GET, "/api/appointments/**").hasAnyRole("DOCTOR",
+                                "NURSE", "ADMINISTRATOR") // Staff can see all
+                        .requestMatchers(HttpMethod.POST, "/api/appointments").hasAnyRole("PATIENT",
+                                "DOCTOR", "NURSE", "ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/appointments/{id}").hasAnyRole("PATIENT",
+                                "DOCTOR", "NURSE", "ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/appointments/{id}").hasAnyRole("PATIENT",
+                                "DOCTOR", "NURSE", "ADMINISTRATOR")
 
-        //for MedicalStaff only:
-                        .requestMatchers("/medicalStaff/**").hasAnyRole("DOCTOR", "TECHNICIAN","NURSE",
-                                "ADMINISTRATOR")
-                        .requestMatchers("/api/medical-records/**").hasAnyRole("DOCTOR", "TECHNICIAN",
-                                "NURSE", "ADMINISTRATOR")
-                        .requestMatchers("/api/appointments/**").hasAnyRole("DOCTOR", "TECHNICIAN",
-                                "NURSE", "ADMINISTRATOR")
+                        // Medical staff operations - patients cannot access
+                        .requestMatchers("/medicalStaff/**").hasAnyRole("DOCTOR", "NURSE", "ADMINISTRATOR")
+                        .requestMatchers("/api/medical-records/**").hasAnyRole("DOCTOR", "NURSE", "ADMINISTRATOR")
 
-                        //admin only endpoints:
+                        // Admin only
                         .requestMatchers("/api/departments/**").hasRole("ADMINISTRATOR")
 
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults()); //
-
+                .httpBasic(withDefaults());
         return http.build();
     }
 
@@ -60,6 +76,7 @@ public class SecurityConfig {
     }
 
     //TEST IN-MEMORY (REPLACE WITH DB for production)
+    @Bean
     public UserDetailsService userDetailsService(){
         UserDetails patient = User.builder()
                 .username("patient")

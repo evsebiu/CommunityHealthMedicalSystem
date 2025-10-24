@@ -13,6 +13,8 @@ import com.example.CommunityHealthMedicalSystem.Repository.PatientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -64,6 +66,20 @@ public class AppointmentServiceImpl implements AppointmentService{
 
     @Override
     public List<Appointment> getAppointmentByPatientId(Long patientId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication.getAuthorities().stream().anyMatch(a ->
+                a.getAuthority().equals("ROLE_PATIENT"))){
+
+            // Use findByEmail (returns Optional<Patient>) instead of findByEmailContainingIgnoreCase
+            Patient currentPatient = patientRepo.findByEmail(authentication.getName())
+                    .orElseThrow(() -> new SecurityException("Patient not found"));
+
+            if (!currentPatient.getId().equals(patientId)){
+                throw new SecurityException("Patient can access only their own appointments.");
+            }
+        }
+
         return appointmentRepo.findByPatientId(patientId);
     }
 

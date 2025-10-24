@@ -22,6 +22,6 @@ List<MedicalStaff> getByDepartment(Long departmentId);
 Optional<MedicalStaff> getMedicalStaffById(Long id);
 
 MedicalStaffDTO createStaff(MedicalStaffDTO medicalStaffDTO);
-void deleteStaff(Long id, MedicalStaff deletingStaff);
+void deleteStaff(Long id);
 MedicalStaffDTO updateStaff(Long id, MedicalStaffDTO medicalStaffDTO);
 }
