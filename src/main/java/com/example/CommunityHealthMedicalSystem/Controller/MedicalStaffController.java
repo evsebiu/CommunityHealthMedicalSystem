@@ -19,9 +19,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api//medicalStaff")
+@RequestMapping("/api/medicalStaff")
 public class MedicalStaffController {
-    MedicalStaffServiceImpl medicalStaffService;
+    private final MedicalStaffServiceImpl medicalStaffService;
+
+    MedicalStaffController(MedicalStaffServiceImpl medicalStaffService){
+        this.medicalStaffService = medicalStaffService;
+    }
 
     @GetMapping
     public List<MedicalStaff> getAllMedicalStaff(){
@@ -52,6 +56,8 @@ public class MedicalStaffController {
             return ResponseEntity.status(HttpStatus.CREATED).body(savedStaff);
         } catch (DuplicateResourceException e){
             return ResponseEntity.badRequest().build();
+        } catch(ResourceNotFound e){
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -81,7 +87,5 @@ public class MedicalStaffController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
-
-
 
 }

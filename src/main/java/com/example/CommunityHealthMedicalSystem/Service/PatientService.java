@@ -16,7 +16,7 @@ public interface PatientService {
     Optional<Patient> findById(Long id);
     List<Patient> findByFirstName(String firstName);
     List<Patient> findByLastName(String lastName);
-    List<Patient> findByEmail(String email);
+    Optional<Patient> findByEmail(String email);
     Optional<Patient> findByPhoneNumber(String phoneNumber);
     Optional<Patient> findByNationalId(String nationalId);
     List<Patient> findByDateOfBirth(LocalDate dateOfBirth);

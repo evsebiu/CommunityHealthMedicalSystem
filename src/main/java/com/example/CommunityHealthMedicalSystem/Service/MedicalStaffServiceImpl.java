@@ -9,6 +9,7 @@ import com.example.CommunityHealthMedicalSystem.Model.MedicalRecord;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Repository.DepartmentRepository;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
 
     private final MedicalStaffRepository medicalStaffRepo;
     private final DepartmentRepository departmentRepo;
+
+    @Autowired
     MedicalStaffServiceImpl(MedicalStaffRepository medicalStaffRepo, DepartmentRepository departmentRepo) {
         this.medicalStaffRepo = medicalStaffRepo;
         this.departmentRepo=departmentRepo;
@@ -138,7 +141,7 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
     public MedicalStaffDTO updateStaff(Long id, MedicalStaffDTO medicalStaffDTO) {
 
         // 1. find existing Medical Staff.
-        MedicalStaff existingStaff = medicalStaffRepo.findById(medicalStaffDTO.getId())
+        MedicalStaff existingStaff = medicalStaffRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFound("Medical Staff not found."));
 
         // 2. validate input
@@ -199,6 +202,10 @@ public class MedicalStaffServiceImpl implements MedicalStaffService {
         dto.setSpecialization(medicalStaff.getSpecialization());
         dto.setLicenseNumber(medicalStaff.getLicenseNumber());
         dto.setDepartmentId(medicalStaff.getDepartment().getId());
+
+        if (medicalStaff.getDepartment() != null ){
+            dto.setDepartmentId(medicalStaff.getDepartment().getId());
+        }
 
         return dto;
     }

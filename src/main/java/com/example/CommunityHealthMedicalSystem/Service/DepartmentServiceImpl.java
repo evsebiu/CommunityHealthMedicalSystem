@@ -41,7 +41,7 @@ public class DepartmentServiceImpl implements DepartmentService{
         if (medicalStaffId == null){
             throw new IllegalArgumentException("Medical staff cannot be null.");
         }
-        return departmentRepo.findByMedicalStaffs(medicalStaffId);
+        return departmentRepo.findByMedicalStaffsId(medicalStaffId);
     }
     @Override
     public DepartmentDTO createDepartment(DepartmentDTO departmentDTO){
@@ -92,7 +92,6 @@ public class DepartmentServiceImpl implements DepartmentService{
 
     @Override
     public List<MedicalStaff> getMedicalStaffByDepartment(Long departmentId){
-        Optional<Department> department= departmentRepo.findById(departmentId);
         if (departmentId == null){
             throw new IllegalArgumentException("ID cannot be null.");
         }

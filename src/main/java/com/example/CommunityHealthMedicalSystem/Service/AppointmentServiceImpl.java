@@ -12,7 +12,6 @@ import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepositor
 import com.example.CommunityHealthMedicalSystem.Repository.PatientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -90,7 +89,7 @@ public class AppointmentServiceImpl implements AppointmentService{
 
     @Override
     public List<Appointment> getAppointmentByMedicalId(Long medicalId){
-        return appointmentRepo.findByMedicalId(medicalId);
+        return appointmentRepo.findByMedicalStaffId(medicalId);
     }
 
     @Override
@@ -126,14 +125,14 @@ public class AppointmentServiceImpl implements AppointmentService{
               .orElseThrow(()-> new ResourceNotFound("Medical staff not found with id: " +
                       appointmentDTO.getMedicalStaffId()));
 
-      Optional<Appointment> existing = appointmentRepo.findByMedicalStaffAndDateTime(medicalStaff,
+      Optional<Appointment> existing = appointmentRepo.findByMedicalStaffAndAppointmentDateTime(medicalStaff,
               appointmentDTO.getAppointmentDateTime());
 
       if (existing.isPresent()){
           throw new DuplicateResourceException("Appointment already exists at this time for this medical staff.");
       }
 
-      Optional<Appointment> patientConflict= appointmentRepo.findByPatientDateAndTime(patient,
+      Optional<Appointment> patientConflict= appointmentRepo.findByPatientAndAppointmentDateTime(patient,
               appointmentDTO.getAppointmentDateTime());
 
       if (patientConflict.isPresent()){
@@ -217,7 +216,7 @@ public class AppointmentServiceImpl implements AppointmentService{
 
                 //staff conflict check
                 Optional<Appointment> staffConflict  = appointmentRepo
-                        .findByMedicalStaffAndDateTime(medicalStaff, appointmentDTO.getAppointmentDateTime());
+                        .findByMedicalStaffAndAppointmentDateTime(medicalStaff, appointmentDTO.getAppointmentDateTime());
                 if (staffConflict.isPresent() && !staffConflict.get().getId().equals(id)){
                     throw new ConflictException("Medical staff already has appointment at this time.");
                 }

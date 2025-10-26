@@ -190,7 +190,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
     @Override
     public MedicalRecordDTO updateMedicalRecord(Long id, MedicalRecordDTO medicalRecordDTO){
         // 1. find existing medical record.
-        MedicalRecord existingRecord = medicalRecordRepo.findById(medicalRecordDTO.getId())
+        MedicalRecord existingRecord = medicalRecordRepo.findById(id)
                 .orElseThrow(()-> new ResourceNotFound("Medical record with ID " + medicalRecordDTO.getId() +
                         " does not exists in database."));
         //2. validate input
