@@ -1,4 +1,4 @@
-package com.example.CommunityHealthMedicalSystem.service;
+package com.example.CommunityHealthMedicalSystem.Service;
 
 import com.example.CommunityHealthMedicalSystem.DTO.MedicalStaffDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
@@ -8,7 +8,6 @@ import com.example.CommunityHealthMedicalSystem.Model.Department;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
 import com.example.CommunityHealthMedicalSystem.Repository.DepartmentRepository;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
-import com.example.CommunityHealthMedicalSystem.Service.MedicalStaffServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

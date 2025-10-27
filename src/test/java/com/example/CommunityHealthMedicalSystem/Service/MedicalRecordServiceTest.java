@@ -1,4 +1,4 @@
-package com.example.CommunityHealthMedicalSystem.service;
+package com.example.CommunityHealthMedicalSystem.Service;
 
 import com.example.CommunityHealthMedicalSystem.DTO.MedicalRecordDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
@@ -11,7 +11,6 @@ import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalRecordRepository;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
 import com.example.CommunityHealthMedicalSystem.Repository.PatientRepository;
-import com.example.CommunityHealthMedicalSystem.Service.MedicalRecordServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -578,6 +577,7 @@ class MedicalRecordServiceTest {
     }
 
     // Test for updateMedicalRecord()
+    // Test for updateMedicalRecord()
     @Test
     void updateMedicalRecord_WithValidData_ShouldReturnUpdatedDTO() {
         // Given
@@ -587,7 +587,12 @@ class MedicalRecordServiceTest {
         updateDTO.setDiagnosis("Updated Diagnosis");
 
         MedicalRecord existingRecord = createSampleMedicalRecord();
+        Patient patient = createSamplePatient();
+        MedicalStaff medicalStaff = createSampleMedicalStaff();
+
         when(medicalRecordRepository.findById(recordId)).thenReturn(Optional.of(existingRecord));
+        when(patientRepository.findById(updateDTO.getPatientId())).thenReturn(Optional.of(patient));
+        when(medicalStaffRepository.findById(updateDTO.getMedicalStaffId())).thenReturn(Optional.of(medicalStaff));
         when(medicalRecordRepository.save(any(MedicalRecord.class))).thenReturn(existingRecord);
 
         // When
@@ -611,7 +616,7 @@ class MedicalRecordServiceTest {
         ResourceNotFound exception = assertThrows(ResourceNotFound.class,
                 () -> medicalRecordService.updateMedicalRecord(recordId, updateDTO));
 
-        assertEquals("Medical record with ID " + updateDTO.getId() + " does not exists in database.", exception.getMessage());
+        assertEquals("Medical record with ID " + recordId + " does not exist in database.", exception.getMessage());
         verify(medicalRecordRepository, never()).save(any(MedicalRecord.class));
     }
 
@@ -619,10 +624,15 @@ class MedicalRecordServiceTest {
     void updateMedicalRecord_WithNullDTO_ShouldThrowException() {
         // Given
         Long recordId = 1L;
+        MedicalRecord existingRecord = createSampleMedicalRecord();
+        when(medicalRecordRepository.findById(recordId)).thenReturn(Optional.of(existingRecord));
 
-        // When & Then - This will throw NullPointerException from your code
-        assertThrows(NullPointerException.class,
+        // When & Then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> medicalRecordService.updateMedicalRecord(recordId, null));
+
+        assertEquals("Medical record cannot be null.", exception.getMessage());
+        verify(medicalRecordRepository, never()).save(any(MedicalRecord.class));
     }
 
     @Test
@@ -637,9 +647,11 @@ class MedicalRecordServiceTest {
         MedicalRecord existingRecord = createSampleMedicalRecord();
         Patient newPatient = createSamplePatient();
         newPatient.setId(newPatientId);
+        MedicalStaff medicalStaff = createSampleMedicalStaff();
 
         when(medicalRecordRepository.findById(recordId)).thenReturn(Optional.of(existingRecord));
         when(patientRepository.findById(newPatientId)).thenReturn(Optional.of(newPatient));
+        when(medicalStaffRepository.findById(updateDTO.getMedicalStaffId())).thenReturn(Optional.of(medicalStaff));
         when(medicalRecordRepository.save(any(MedicalRecord.class))).thenReturn(existingRecord);
 
         // When

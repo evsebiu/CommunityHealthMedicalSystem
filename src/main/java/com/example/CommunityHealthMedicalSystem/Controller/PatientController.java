@@ -1,6 +1,5 @@
 package com.example.CommunityHealthMedicalSystem.Controller;
 
-
 import com.example.CommunityHealthMedicalSystem.DTO.PatientDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.ConflictException;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
@@ -44,7 +43,7 @@ public class PatientController {
     }
 
     @PostMapping
-    public ResponseEntity<PatientDTO> createPatient(@RequestBody PatientDTO patientDTO){
+    public ResponseEntity<PatientDTO> createPatient(@Valid @RequestBody PatientDTO patientDTO){ // Added @Valid here
         try {
             PatientDTO savedPatient = patientService.createPatient(patientDTO);
             return ResponseEntity.ok(savedPatient);
@@ -55,7 +54,7 @@ public class PatientController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PatientDTO> updatePatient(@PathVariable Long id,
-                                                    @RequestBody @Valid PatientDTO patientDTO){
+                                                    @Valid @RequestBody PatientDTO patientDTO){
         try {
             PatientDTO updatePatient = patientService.updatePatient(id, patientDTO);
             return ResponseEntity.ok(updatePatient);
@@ -79,6 +78,7 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
+
     @GetMapping("/search")
     public ResponseEntity<List<Patient>> searchPatients(
             @RequestParam(required = false) String firstName,

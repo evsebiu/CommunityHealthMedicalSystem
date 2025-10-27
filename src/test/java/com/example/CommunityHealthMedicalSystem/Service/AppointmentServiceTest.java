@@ -1,4 +1,4 @@
-package com.example.CommunityHealthMedicalSystem.service;
+package com.example.CommunityHealthMedicalSystem.Service;
 
 import com.example.CommunityHealthMedicalSystem.DTO.AppointmentDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.*;
@@ -10,7 +10,6 @@ import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import com.example.CommunityHealthMedicalSystem.Repository.AppointmentRepository;
 import com.example.CommunityHealthMedicalSystem.Repository.MedicalStaffRepository;
 import com.example.CommunityHealthMedicalSystem.Repository.PatientRepository;
-import com.example.CommunityHealthMedicalSystem.Service.AppointmentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -102,10 +101,9 @@ class AppointmentServiceTest {
 
     private void setupSecurityContext(String username, String role) {
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
-        // Use doReturn instead of when().thenReturn() for getAuthorities()
-        when(authentication.getName()).thenReturn(username);
-        doReturn(authorities).when(authentication).getAuthorities();
-        when(securityContext.getAuthentication()).thenReturn(authentication);
+        lenient().when(authentication.getName()).thenReturn(username);
+        lenient().doReturn(authorities).when(authentication).getAuthorities();
+        lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
 
@@ -605,10 +603,16 @@ class AppointmentServiceTest {
         Long appointmentId = 1L;
         AppointmentDTO updateDTO = createSampleAppointmentDTO();
         updateDTO.setId(appointmentId);
+        updateDTO.setDiagnosis("Updated reason"); // Changed from setDiagnosis to setReason
         updateDTO.setReason("Updated reason");
 
         Appointment existingAppointment = createSampleAppointment();
+        Patient patient = createSamplePatient();
+        MedicalStaff medicalStaff = createSampleMedicalStaff();
+
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(existingAppointment));
+        when(patientRepository.findById(updateDTO.getPatientId())).thenReturn(Optional.of(patient));
+        when(medicalStaffRepository.findById(updateDTO.getMedicalStaffId())).thenReturn(Optional.of(medicalStaff));
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(existingAppointment);
 
         // When
@@ -639,8 +643,12 @@ class AppointmentServiceTest {
     void updateAppointment_WithNullDTO_ShouldThrowException() {
         // Given
         Long appointmentId = 1L;
+        Appointment existingAppointment = createSampleAppointment();
 
-        // When & Then
+        // Mock the repository to return the existing appointment
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(existingAppointment));
+
+        // When & Then - Should throw IllegalArgumentException, not ResourceNotFound
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> appointmentService.updateAppointment(appointmentId, null));
 
@@ -685,9 +693,11 @@ class AppointmentServiceTest {
         Appointment existingAppointment = createSampleAppointment();
         Patient newPatient = createSamplePatient();
         newPatient.setId(newPatientId);
+        MedicalStaff medicalStaff = createSampleMedicalStaff(); // Add this
 
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(existingAppointment));
         when(patientRepository.findById(newPatientId)).thenReturn(Optional.of(newPatient));
+        when(medicalStaffRepository.findById(updateDTO.getMedicalStaffId())).thenReturn(Optional.of(medicalStaff)); // Add this
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(existingAppointment);
 
         // When
@@ -711,9 +721,11 @@ class AppointmentServiceTest {
         Appointment existingAppointment = createSampleAppointment();
         MedicalStaff newMedicalStaff = createSampleMedicalStaff();
         newMedicalStaff.setId(newMedicalStaffId);
+        Patient patient = createSamplePatient(); // Add this
 
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(existingAppointment));
         when(medicalStaffRepository.findById(newMedicalStaffId)).thenReturn(Optional.of(newMedicalStaff));
+        when(patientRepository.findById(updateDTO.getPatientId())).thenReturn(Optional.of(patient)); // Add this
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(existingAppointment);
 
         // When

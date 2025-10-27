@@ -1,11 +1,10 @@
-package com.example.CommunityHealthMedicalSystem.service;
+package com.example.CommunityHealthMedicalSystem.Service;
 
 import com.example.CommunityHealthMedicalSystem.DTO.PatientDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
 import com.example.CommunityHealthMedicalSystem.Model.Patient;
 import com.example.CommunityHealthMedicalSystem.Repository.PatientRepository;
-import com.example.CommunityHealthMedicalSystem.Service.PatientServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

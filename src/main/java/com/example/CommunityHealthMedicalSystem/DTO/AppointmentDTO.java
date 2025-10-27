@@ -20,7 +20,7 @@ public class AppointmentDTO {
     @NotNull(message = "Doctor ID is required.")
     private Long medicalStaffId;
 
-    @Pattern(regexp = "SCHEDULED|COMPLETED|CANCELLED", message = "Invalid status.")
+
     private Appointment.Status status;
 
     @Future(message = "Appointment have to be in future.")
@@ -42,4 +42,6 @@ public class AppointmentDTO {
     @Max(value = 240, message = "Appointment cannot exceed 4 hours.")
     private Integer appointmentDuration;
 
+    public void setDiagnosis(String updatedReason) {
+    }
 }

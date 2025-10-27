@@ -1,7 +1,5 @@
 package com.example.CommunityHealthMedicalSystem.Controller;
 
-
-
 import com.example.CommunityHealthMedicalSystem.DTO.MedicalRecordDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.ConflictException;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
@@ -53,7 +51,7 @@ public class MedicalRecordController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping("/by-patient/{patientId")
+    @GetMapping("/by-patient/{patientId}")
     public ResponseEntity<List<MedicalRecord>> getMedicalRecordByPatient(@PathVariable Long patientId){
         List<MedicalRecord> medicalRecords = medicalService.getMedicalRecordByPatientId(patientId);
         if (medicalRecords.isEmpty()){
@@ -63,7 +61,7 @@ public class MedicalRecordController {
     }
 
     @PostMapping
-    public ResponseEntity<MedicalRecordDTO> createMedicalRecord(@RequestBody MedicalRecordDTO medicalRecordDTO){
+    public ResponseEntity<MedicalRecordDTO> createMedicalRecord(@RequestBody @Valid MedicalRecordDTO medicalRecordDTO){ // FIXED: Added @Valid
         try{
             MedicalRecordDTO savedMedicalRecord = medicalService.createMedicalRecord(medicalRecordDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedMedicalRecord);
@@ -89,7 +87,7 @@ public class MedicalRecordController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMedicalRecord(@PathVariable Long id,
-    @RequestParam Long medicalStaffId){
+                                                    @RequestParam Long medicalStaffId){
         try{
             medicalService.deleteMedicalRecord(id, medicalStaffId);
             return ResponseEntity.noContent().build();
@@ -100,5 +98,3 @@ public class MedicalRecordController {
         }
     }
 }
-
-

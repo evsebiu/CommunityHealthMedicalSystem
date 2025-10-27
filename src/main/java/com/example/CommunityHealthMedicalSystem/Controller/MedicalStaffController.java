@@ -1,16 +1,13 @@
 package com.example.CommunityHealthMedicalSystem.Controller;
 
-
-import com.example.CommunityHealthMedicalSystem.DTO.MedicalRecordDTO;
 import com.example.CommunityHealthMedicalSystem.DTO.MedicalStaffDTO;
 import com.example.CommunityHealthMedicalSystem.Exception.ConflictException;
 import com.example.CommunityHealthMedicalSystem.Exception.DuplicateResourceException;
 import com.example.CommunityHealthMedicalSystem.Exception.IllegalArgumentException;
 import com.example.CommunityHealthMedicalSystem.Exception.ResourceNotFound;
-import com.example.CommunityHealthMedicalSystem.Model.MedicalRecord;
 import com.example.CommunityHealthMedicalSystem.Model.MedicalStaff;
-import com.example.CommunityHealthMedicalSystem.Service.MedicalRecordServiceImpl;
 import com.example.CommunityHealthMedicalSystem.Service.MedicalStaffServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +47,7 @@ public class MedicalStaffController {
     }
 
     @PostMapping
-    public ResponseEntity<MedicalStaffDTO> createMedicalStaff(@RequestBody MedicalStaffDTO medicalStaffDTO){
+    public ResponseEntity<MedicalStaffDTO> createMedicalStaff(@Valid @RequestBody MedicalStaffDTO medicalStaffDTO){
         try{
             MedicalStaffDTO savedStaff = medicalStaffService.createStaff(medicalStaffDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedStaff);
@@ -63,7 +60,7 @@ public class MedicalStaffController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MedicalStaffDTO> updateMedicalStaff(@PathVariable Long id,
-                                                              @RequestBody MedicalStaffDTO medicalStaffDTO){
+                                                              @Valid @RequestBody MedicalStaffDTO medicalStaffDTO){
         try{
             MedicalStaffDTO updatedStaff = medicalStaffService.updateStaff(id, medicalStaffDTO);
             return ResponseEntity.ok(updatedStaff);
@@ -87,5 +84,4 @@ public class MedicalStaffController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
-
 }
