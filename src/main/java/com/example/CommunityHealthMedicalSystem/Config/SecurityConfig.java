@@ -1,4 +1,4 @@
-package com.example.CommunityHealthMedicalSystem.config;
+package com.example.CommunityHealthMedicalSystem.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
