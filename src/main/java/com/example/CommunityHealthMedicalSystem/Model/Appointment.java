@@ -37,7 +37,6 @@ public class Appointment {
 
     private String notes;
 
-    @NotNull(message = "Appointment duration is required.")
     @Column(name = "duration_minutes")
     private Integer appointmentDuration;
 

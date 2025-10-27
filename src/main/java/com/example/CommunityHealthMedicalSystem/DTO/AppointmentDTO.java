@@ -37,9 +37,7 @@ public class AppointmentDTO {
     @Size(max = 1500, message = "Appointment notes cannot exceed 1.500 characters.")
     private String notes;
 
-    @NotNull(message = "Appointment duration is required.")
-    @Min(value = 15, message = "Appointment must be at least 15 minutes.")
-    @Max(value = 240, message = "Appointment cannot exceed 4 hours.")
+
     private Integer appointmentDuration;
 
     public void setDiagnosis(String updatedReason) {

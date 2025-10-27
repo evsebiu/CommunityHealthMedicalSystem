@@ -144,12 +144,8 @@ public class AppointmentController {
             return ResponseEntity.status(HttpStatus.CREATED).body(savedAppointment);
         } catch (DuplicateResourceException e) {
             return ResponseEntity.badRequest().build();
-        } catch (ResourceNotFound e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (ConflictException e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        } catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(null);
         }
     }
 
