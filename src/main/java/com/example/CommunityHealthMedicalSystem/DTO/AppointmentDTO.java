@@ -33,13 +33,17 @@ public class AppointmentDTO {
     @Size(max = 500, message = "Reason cannot exceed 500 characters.")
     private String reason;
 
-    @NotBlank(message = "Appointment notes are required.")
+
     @Size(max = 1500, message = "Appointment notes cannot exceed 1.500 characters.")
     private String notes;
+
+    @Size(max = 1000, message = "Diagnosis cannot exceed 1000 characters.")
+    private String diagnosis;
 
 
     private Integer appointmentDuration;
 
     public void setDiagnosis(String updatedReason) {
+        this.diagnosis = diagnosis;
     }
 }

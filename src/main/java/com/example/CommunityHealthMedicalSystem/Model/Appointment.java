@@ -37,6 +37,8 @@ public class Appointment {
 
     private String notes;
 
+    private String diagnosis;
+
     @Column(name = "duration_minutes")
     private Integer appointmentDuration;
 
