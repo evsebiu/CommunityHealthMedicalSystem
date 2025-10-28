@@ -110,3 +110,5 @@ In an industry where reliability and compliance are non-negotiable, CHMS stands 
 🔐 Secure, auditable operations
 
 By combining robust enterprise engineering with healthcare-specific design, CHMS lays a solid foundation for future integration with national health networks, telemedicine systems, and intelligent clinical data platforms.
+
+Final project as a student of the ITSchool Romania course
